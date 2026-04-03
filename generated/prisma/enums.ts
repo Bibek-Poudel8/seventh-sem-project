@@ -9,7 +9,85 @@
 * 🟢 You can import this file directly.
 */
 
+export const TransactionType = {
+  INCOME: 'INCOME',
+  EXPENSE: 'EXPENSE'
+} as const
+
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const PaymentMethodType = {
+  CASH: 'CASH',
+  BANK_ACCOUNT: 'BANK_ACCOUNT',
+  CREDIT_CARD: 'CREDIT_CARD',
+  DEBIT_CARD: 'DEBIT_CARD',
+  E_WALLET: 'E_WALLET',
+  CRYPTO: 'CRYPTO',
+  OTHER: 'OTHER'
+} as const
+
+export type PaymentMethodType = (typeof PaymentMethodType)[keyof typeof PaymentMethodType]
+
+
+export const BudgetPeriod = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  MONTHLY: 'MONTHLY',
+  QUARTERLY: 'QUARTERLY',
+  YEARLY: 'YEARLY',
+  CUSTOM: 'CUSTOM'
+} as const
+
+export type BudgetPeriod = (typeof BudgetPeriod)[keyof typeof BudgetPeriod]
+
+
+export const RecurrenceFrequency = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  BIWEEKLY: 'BIWEEKLY',
+  MONTHLY: 'MONTHLY',
+  QUARTERLY: 'QUARTERLY',
+  YEARLY: 'YEARLY'
+} as const
+
+export type RecurrenceFrequency = (typeof RecurrenceFrequency)[keyof typeof RecurrenceFrequency]
+
+
+export const NotificationType = {
+  BUDGET_WARNING: 'BUDGET_WARNING',
+  BUDGET_EXCEEDED: 'BUDGET_EXCEEDED',
+  RECURRING_DUE: 'RECURRING_DUE',
+  RECURRING_PROCESSED: 'RECURRING_PROCESSED',
+  EXPORT_READY: 'EXPORT_READY',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const ExportFormat = {
+  CSV: 'CSV',
+  PDF: 'PDF',
+  XLSX: 'XLSX'
+} as const
+
+export type ExportFormat = (typeof ExportFormat)[keyof typeof ExportFormat]
+
+
+export const ExportStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+} as const
+
+export type ExportStatus = (typeof ExportStatus)[keyof typeof ExportStatus]
+
+
+export const Theme = {
+  LIGHT: 'LIGHT',
+  DARK: 'DARK',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type Theme = (typeof Theme)[keyof typeof Theme]

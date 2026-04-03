@@ -1,3 +1,7 @@
+// =============================================================================
+// Personal Finance Assistant — Prisma Schema (PostgreSQL)
+// ORM: Prisma | Auth: NextAuth.js | Backend: Next.js API Routes
+// =============================================================================
 datasource db {
   provider = "postgresql"
 }
@@ -7,20 +11,74 @@ generator client {
   output   = "../generated/prisma"
 }
 
-model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String          @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  // Optional for WebAuthn support
-  Authenticator Authenticator[]
+// =============================================================================
+// ENUMS
+// =============================================================================
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum TransactionType {
+  INCOME
+  EXPENSE
 }
+
+enum PaymentMethodType {
+  CASH
+  BANK_ACCOUNT
+  CREDIT_CARD
+  DEBIT_CARD
+  E_WALLET
+  CRYPTO
+  OTHER
+}
+
+enum BudgetPeriod {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+enum RecurrenceFrequency {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum NotificationType {
+  BUDGET_WARNING
+  BUDGET_EXCEEDED
+  RECURRING_DUE
+  RECURRING_PROCESSED
+  EXPORT_READY
+  SYSTEM
+}
+
+enum ExportFormat {
+  CSV
+  PDF
+  XLSX
+}
+
+enum ExportStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum Theme {
+  LIGHT
+  DARK
+  SYSTEM
+}
+
+// =============================================================================
+// NEXTAUTH MODELS
+// Required by NextAuth.js — do not modify field names.
+// =============================================================================
 
 model Account {
   id                String  @id @default(cuid())
@@ -28,49 +86,296 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
 }
 
 model Session {
+  id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
 }
 
 model VerificationToken {
   identifier String
-  token      String
+  token      String   @unique
   expires    DateTime
 
-  @@id([identifier, token])
+  @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
-// Optional for WebAuthn support
-model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
+// =============================================================================
+// USER & PROFILE
+// =============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String? // OAuth avatar URL
+  password      String? // Hashed via bcrypt (null for OAuth users)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  profile               UserProfile?
+  accounts              Account[]
+  sessions              Session[]
+  categories            Category[]
+  transactions          Transaction[]
+  paymentMethods        PaymentMethod[]
+  budgets               Budget[]
+  notifications         Notification[]
+  recurringTransactions RecurringTransaction[]
+  exportLogs            ExportLog[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  currency               String   @default("NPR") // ISO 4217 currency code
+  locale                 String   @default("en-US") // BCP 47 locale
+  theme                  Theme    @default(SYSTEM)
+  timezone               String   @default("UTC") // IANA timezone string
+  // BONUS: extend with notification preferences (email digest, push, etc.)
+  notifyBudgetWarningPct Int      @default(80) // Warn at X% of budget used
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([userId, credentialID])
+  @@map("user_profiles")
+}
+
+// =============================================================================
+// CATEGORIES
+// Supports both global (system) categories and user-defined categories.
+// Global categories have userId = null.
+// =============================================================================
+
+model Category {
+  id         String          @id @default(cuid())
+  userId     String? // null = global/system category
+  name       String
+  type       TransactionType
+  icon       String? // Icon identifier (e.g., "shopping-cart")
+  color      String? // Hex color code (e.g., "#FF5733")
+  isSystem   Boolean         @default(false) // True for predefined categories
+  isArchived Boolean         @default(false) // Soft-delete for user categories
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  // Relations
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+
+  // A user cannot have two categories with the same name and type
+  @@unique([userId, name, type])
+  @@index([userId])
+  @@index([type])
+  @@map("categories")
+}
+
+// =============================================================================
+// PAYMENT METHODS
+// Represents cash, bank accounts, e-wallets, etc. owned by the user.
+// =============================================================================
+
+model PaymentMethod {
+  id            String            @id @default(cuid())
+  userId        String
+  name          String // e.g., "BCA Savings", "GoPay", "Cash"
+  type          PaymentMethodType
+  balance       Decimal?          @db.Decimal(18, 2) // Optional tracked balance
+  accountNumber String? // Last 4 digits or masked number
+  isArchived    Boolean           @default(false)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@index([userId])
+  @@map("payment_methods")
+}
+
+// =============================================================================
+// TRANSACTIONS
+// Core financial record. Supports AI categorization via external ML service.
+// =============================================================================
+
+model Transaction {
+  id                     String  @id @default(cuid())
+  userId                 String
+  categoryId             String?
+  paymentMethodId        String?
+  recurringTransactionId String? // Non-null if spawned by a recurrence
+
+  amount      Decimal         @db.Decimal(18, 2)
+  type        TransactionType
+  description String?         @db.Text
+  date        DateTime // The actual date of the transaction
+  notes       String?         @db.Text
+
+  // AI Categorization
+  isAiCategorized   Boolean @default(false)
+  aiCategoryRaw     String? // Raw label returned by external ML service
+  aiConfidenceScore Float? // Optional confidence score (0.0 – 1.0)
+
+  // Soft delete support
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user                 User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  paymentMethod        PaymentMethod?        @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+
+  // Indexes for common query patterns
+  @@index([userId])
+  @@index([userId, date]) // Date range filtering per user
+  @@index([userId, categoryId]) // Category filtering per user
+  @@index([userId, type]) // Income vs Expense filtering
+  @@index([userId, paymentMethodId])
+  @@index([date])
+  @@map("transactions")
+}
+
+// =============================================================================
+// BUDGETS
+// Per-category, per-period budget limits.
+// =============================================================================
+
+model Budget {
+  id          String       @id @default(cuid())
+  userId      String
+  categoryId  String
+  period      BudgetPeriod
+  amountLimit Decimal      @db.Decimal(18, 2)
+  startDate   DateTime
+  endDate     DateTime? // Null for open-ended or auto-rolling budgets
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  // A user should not have duplicate active budgets for the same category/period/start
+  @@unique([userId, categoryId, period, startDate])
+  @@index([userId])
+  @@index([userId, categoryId])
+  @@index([userId, isActive])
+  @@map("budgets")
+}
+
+// =============================================================================
+// RECURRING TRANSACTIONS
+// Subscription/recurring payment templates. Actual transactions are spawned
+// from these records by a background job or cron.
+// =============================================================================
+
+model RecurringTransaction {
+  id              String  @id @default(cuid())
+  userId          String
+  categoryId      String?
+  paymentMethodId String?
+
+  title       String // e.g., "Netflix Subscription"
+  amount      Decimal             @db.Decimal(18, 2)
+  type        TransactionType
+  description String?             @db.Text
+  frequency   RecurrenceFrequency
+  startDate   DateTime
+  endDate     DateTime? // Null = runs indefinitely
+  nextDueDate DateTime
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[] // All transactions spawned from this recurrence
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@index([nextDueDate]) // Used by background job to find due recurrences
+  @@map("recurring_transactions")
+}
+
+// =============================================================================
+// NOTIFICATIONS
+// In-app alerts for budgets, due dates, and system events.
+// =============================================================================
+
+model Notification {
+  id                String           @id @default(cuid())
+  userId            String
+  type              NotificationType
+  title             String
+  message           String           @db.Text
+  isRead            Boolean          @default(false)
+  // BONUS: add relatedEntityId / relatedEntityType for deep-linking notifications
+  // to the specific budget or transaction that triggered them.
+  relatedEntityId   String? // e.g., budgetId, transactionId
+  relatedEntityType String? // e.g., "Budget", "Transaction"
+  createdAt         DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead]) // Efficiently fetch unread count
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// =============================================================================
+// EXPORT LOGS
+// Tracks data export history per user (CSV, PDF, XLSX).
+// =============================================================================
+
+model ExportLog {
+  id           String       @id @default(cuid())
+  userId       String
+  format       ExportFormat
+  status       ExportStatus @default(PENDING)
+  fileUrl      String? // Signed URL or storage path after completion
+  filters      Json? // Snapshot of applied filters (dateRange, categories, etc.)
+  errorMessage String? // Populated if status = FAILED
+  createdAt    DateTime     @default(now())
+  completedAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@map("export_logs")
 }

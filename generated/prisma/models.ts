@@ -8,9 +8,16 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/User'
 export type * from './models/Account'
 export type * from './models/Session'
 export type * from './models/VerificationToken'
-export type * from './models/Authenticator'
+export type * from './models/User'
+export type * from './models/UserProfile'
+export type * from './models/Category'
+export type * from './models/PaymentMethod'
+export type * from './models/Transaction'
+export type * from './models/Budget'
+export type * from './models/RecurringTransaction'
+export type * from './models/Notification'
+export type * from './models/ExportLog'
 export type * from './commonInputTypes'
