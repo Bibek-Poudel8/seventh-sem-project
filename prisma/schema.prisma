@@ -158,8 +158,13 @@ model UserProfile {
   locale                 String   @default("en-US") // BCP 47 locale
   theme                  Theme    @default(SYSTEM)
   timezone               String   @default("UTC") // IANA timezone string
-  // BONUS: extend with notification preferences (email digest, push, etc.)
   notifyBudgetWarningPct Int      @default(80) // Warn at X% of budget used
+  // User preferences
+  weekStartsOn           Int      @default(1) // 0=Sunday, 1=Monday
+  dateFormat             String   @default("DD/MM/YYYY")
+  defaultTransactionType TransactionType @default(EXPENSE)
+  // Push notification subscription (JSON string)
+  pushSubscription       String?  @db.Text
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 

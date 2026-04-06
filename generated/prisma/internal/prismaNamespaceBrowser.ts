@@ -140,6 +140,10 @@ export const UserProfileScalarFieldEnum = {
   theme: 'theme',
   timezone: 'timezone',
   notifyBudgetWarningPct: 'notifyBudgetWarningPct',
+  weekStartsOn: 'weekStartsOn',
+  dateFormat: 'dateFormat',
+  defaultTransactionType: 'defaultTransactionType',
+  pushSubscription: 'pushSubscription',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
