@@ -28,10 +28,12 @@ export type AggregateUserProfile = {
 
 export type UserProfileAvgAggregateOutputType = {
   notifyBudgetWarningPct: number | null
+  weekStartsOn: number | null
 }
 
 export type UserProfileSumAggregateOutputType = {
   notifyBudgetWarningPct: number | null
+  weekStartsOn: number | null
 }
 
 export type UserProfileMinAggregateOutputType = {
@@ -42,6 +44,10 @@ export type UserProfileMinAggregateOutputType = {
   theme: $Enums.Theme | null
   timezone: string | null
   notifyBudgetWarningPct: number | null
+  weekStartsOn: number | null
+  dateFormat: string | null
+  defaultTransactionType: $Enums.TransactionType | null
+  pushSubscription: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,6 +60,10 @@ export type UserProfileMaxAggregateOutputType = {
   theme: $Enums.Theme | null
   timezone: string | null
   notifyBudgetWarningPct: number | null
+  weekStartsOn: number | null
+  dateFormat: string | null
+  defaultTransactionType: $Enums.TransactionType | null
+  pushSubscription: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +76,10 @@ export type UserProfileCountAggregateOutputType = {
   theme: number
   timezone: number
   notifyBudgetWarningPct: number
+  weekStartsOn: number
+  dateFormat: number
+  defaultTransactionType: number
+  pushSubscription: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -74,10 +88,12 @@ export type UserProfileCountAggregateOutputType = {
 
 export type UserProfileAvgAggregateInputType = {
   notifyBudgetWarningPct?: true
+  weekStartsOn?: true
 }
 
 export type UserProfileSumAggregateInputType = {
   notifyBudgetWarningPct?: true
+  weekStartsOn?: true
 }
 
 export type UserProfileMinAggregateInputType = {
@@ -88,6 +104,10 @@ export type UserProfileMinAggregateInputType = {
   theme?: true
   timezone?: true
   notifyBudgetWarningPct?: true
+  weekStartsOn?: true
+  dateFormat?: true
+  defaultTransactionType?: true
+  pushSubscription?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +120,10 @@ export type UserProfileMaxAggregateInputType = {
   theme?: true
   timezone?: true
   notifyBudgetWarningPct?: true
+  weekStartsOn?: true
+  dateFormat?: true
+  defaultTransactionType?: true
+  pushSubscription?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -112,6 +136,10 @@ export type UserProfileCountAggregateInputType = {
   theme?: true
   timezone?: true
   notifyBudgetWarningPct?: true
+  weekStartsOn?: true
+  dateFormat?: true
+  defaultTransactionType?: true
+  pushSubscription?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -211,6 +239,10 @@ export type UserProfileGroupByOutputType = {
   theme: $Enums.Theme
   timezone: string
   notifyBudgetWarningPct: number
+  weekStartsOn: number
+  dateFormat: string
+  defaultTransactionType: $Enums.TransactionType
+  pushSubscription: string | null
   createdAt: Date
   updatedAt: Date
   _count: UserProfileCountAggregateOutputType | null
@@ -246,6 +278,10 @@ export type UserProfileWhereInput = {
   theme?: Prisma.EnumThemeFilter<"UserProfile"> | $Enums.Theme
   timezone?: Prisma.StringFilter<"UserProfile"> | string
   notifyBudgetWarningPct?: Prisma.IntFilter<"UserProfile"> | number
+  weekStartsOn?: Prisma.IntFilter<"UserProfile"> | number
+  dateFormat?: Prisma.StringFilter<"UserProfile"> | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFilter<"UserProfile"> | $Enums.TransactionType
+  pushSubscription?: Prisma.StringNullableFilter<"UserProfile"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -259,6 +295,10 @@ export type UserProfileOrderByWithRelationInput = {
   theme?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
+  dateFormat?: Prisma.SortOrder
+  defaultTransactionType?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -275,6 +315,10 @@ export type UserProfileWhereUniqueInput = Prisma.AtLeast<{
   theme?: Prisma.EnumThemeFilter<"UserProfile"> | $Enums.Theme
   timezone?: Prisma.StringFilter<"UserProfile"> | string
   notifyBudgetWarningPct?: Prisma.IntFilter<"UserProfile"> | number
+  weekStartsOn?: Prisma.IntFilter<"UserProfile"> | number
+  dateFormat?: Prisma.StringFilter<"UserProfile"> | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFilter<"UserProfile"> | $Enums.TransactionType
+  pushSubscription?: Prisma.StringNullableFilter<"UserProfile"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserProfile"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -288,6 +332,10 @@ export type UserProfileOrderByWithAggregationInput = {
   theme?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
+  dateFormat?: Prisma.SortOrder
+  defaultTransactionType?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserProfileCountOrderByAggregateInput
@@ -308,6 +356,10 @@ export type UserProfileScalarWhereWithAggregatesInput = {
   theme?: Prisma.EnumThemeWithAggregatesFilter<"UserProfile"> | $Enums.Theme
   timezone?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string
   notifyBudgetWarningPct?: Prisma.IntWithAggregatesFilter<"UserProfile"> | number
+  weekStartsOn?: Prisma.IntWithAggregatesFilter<"UserProfile"> | number
+  dateFormat?: Prisma.StringWithAggregatesFilter<"UserProfile"> | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeWithAggregatesFilter<"UserProfile"> | $Enums.TransactionType
+  pushSubscription?: Prisma.StringNullableWithAggregatesFilter<"UserProfile"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserProfile"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserProfile"> | Date | string
 }
@@ -319,6 +371,10 @@ export type UserProfileCreateInput = {
   theme?: $Enums.Theme
   timezone?: string
   notifyBudgetWarningPct?: number
+  weekStartsOn?: number
+  dateFormat?: string
+  defaultTransactionType?: $Enums.TransactionType
+  pushSubscription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutProfileInput
@@ -332,6 +388,10 @@ export type UserProfileUncheckedCreateInput = {
   theme?: $Enums.Theme
   timezone?: string
   notifyBudgetWarningPct?: number
+  weekStartsOn?: number
+  dateFormat?: string
+  defaultTransactionType?: $Enums.TransactionType
+  pushSubscription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -343,6 +403,10 @@ export type UserProfileUpdateInput = {
   theme?: Prisma.EnumThemeFieldUpdateOperationsInput | $Enums.Theme
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   notifyBudgetWarningPct?: Prisma.IntFieldUpdateOperationsInput | number
+  weekStartsOn?: Prisma.IntFieldUpdateOperationsInput | number
+  dateFormat?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutProfileNestedInput
@@ -356,6 +420,10 @@ export type UserProfileUncheckedUpdateInput = {
   theme?: Prisma.EnumThemeFieldUpdateOperationsInput | $Enums.Theme
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   notifyBudgetWarningPct?: Prisma.IntFieldUpdateOperationsInput | number
+  weekStartsOn?: Prisma.IntFieldUpdateOperationsInput | number
+  dateFormat?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -368,6 +436,10 @@ export type UserProfileCreateManyInput = {
   theme?: $Enums.Theme
   timezone?: string
   notifyBudgetWarningPct?: number
+  weekStartsOn?: number
+  dateFormat?: string
+  defaultTransactionType?: $Enums.TransactionType
+  pushSubscription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -379,6 +451,10 @@ export type UserProfileUpdateManyMutationInput = {
   theme?: Prisma.EnumThemeFieldUpdateOperationsInput | $Enums.Theme
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   notifyBudgetWarningPct?: Prisma.IntFieldUpdateOperationsInput | number
+  weekStartsOn?: Prisma.IntFieldUpdateOperationsInput | number
+  dateFormat?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -391,6 +467,10 @@ export type UserProfileUncheckedUpdateManyInput = {
   theme?: Prisma.EnumThemeFieldUpdateOperationsInput | $Enums.Theme
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   notifyBudgetWarningPct?: Prisma.IntFieldUpdateOperationsInput | number
+  weekStartsOn?: Prisma.IntFieldUpdateOperationsInput | number
+  dateFormat?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -408,12 +488,17 @@ export type UserProfileCountOrderByAggregateInput = {
   theme?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
+  dateFormat?: Prisma.SortOrder
+  defaultTransactionType?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UserProfileAvgOrderByAggregateInput = {
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
 }
 
 export type UserProfileMaxOrderByAggregateInput = {
@@ -424,6 +509,10 @@ export type UserProfileMaxOrderByAggregateInput = {
   theme?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
+  dateFormat?: Prisma.SortOrder
+  defaultTransactionType?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -436,12 +525,17 @@ export type UserProfileMinOrderByAggregateInput = {
   theme?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
+  dateFormat?: Prisma.SortOrder
+  defaultTransactionType?: Prisma.SortOrder
+  pushSubscription?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UserProfileSumOrderByAggregateInput = {
   notifyBudgetWarningPct?: Prisma.SortOrder
+  weekStartsOn?: Prisma.SortOrder
 }
 
 export type UserProfileCreateNestedOneWithoutUserInput = {
@@ -488,6 +582,10 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumTransactionTypeFieldUpdateOperationsInput = {
+  set?: $Enums.TransactionType
+}
+
 export type UserProfileCreateWithoutUserInput = {
   id?: string
   currency?: string
@@ -495,6 +593,10 @@ export type UserProfileCreateWithoutUserInput = {
   theme?: $Enums.Theme
   timezone?: string
   notifyBudgetWarningPct?: number
+  weekStartsOn?: number
+  dateFormat?: string
+  defaultTransactionType?: $Enums.TransactionType
+  pushSubscription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -506,6 +608,10 @@ export type UserProfileUncheckedCreateWithoutUserInput = {
   theme?: $Enums.Theme
   timezone?: string
   notifyBudgetWarningPct?: number
+  weekStartsOn?: number
+  dateFormat?: string
+  defaultTransactionType?: $Enums.TransactionType
+  pushSubscription?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -533,6 +639,10 @@ export type UserProfileUpdateWithoutUserInput = {
   theme?: Prisma.EnumThemeFieldUpdateOperationsInput | $Enums.Theme
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   notifyBudgetWarningPct?: Prisma.IntFieldUpdateOperationsInput | number
+  weekStartsOn?: Prisma.IntFieldUpdateOperationsInput | number
+  dateFormat?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -544,6 +654,10 @@ export type UserProfileUncheckedUpdateWithoutUserInput = {
   theme?: Prisma.EnumThemeFieldUpdateOperationsInput | $Enums.Theme
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   notifyBudgetWarningPct?: Prisma.IntFieldUpdateOperationsInput | number
+  weekStartsOn?: Prisma.IntFieldUpdateOperationsInput | number
+  dateFormat?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultTransactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
+  pushSubscription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -558,6 +672,10 @@ export type UserProfileSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   theme?: boolean
   timezone?: boolean
   notifyBudgetWarningPct?: boolean
+  weekStartsOn?: boolean
+  dateFormat?: boolean
+  defaultTransactionType?: boolean
+  pushSubscription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -571,6 +689,10 @@ export type UserProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   theme?: boolean
   timezone?: boolean
   notifyBudgetWarningPct?: boolean
+  weekStartsOn?: boolean
+  dateFormat?: boolean
+  defaultTransactionType?: boolean
+  pushSubscription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -584,6 +706,10 @@ export type UserProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   theme?: boolean
   timezone?: boolean
   notifyBudgetWarningPct?: boolean
+  weekStartsOn?: boolean
+  dateFormat?: boolean
+  defaultTransactionType?: boolean
+  pushSubscription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -597,11 +723,15 @@ export type UserProfileSelectScalar = {
   theme?: boolean
   timezone?: boolean
   notifyBudgetWarningPct?: boolean
+  weekStartsOn?: boolean
+  dateFormat?: boolean
+  defaultTransactionType?: boolean
+  pushSubscription?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "currency" | "locale" | "theme" | "timezone" | "notifyBudgetWarningPct" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
+export type UserProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "currency" | "locale" | "theme" | "timezone" | "notifyBudgetWarningPct" | "weekStartsOn" | "dateFormat" | "defaultTransactionType" | "pushSubscription" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
 export type UserProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -625,6 +755,10 @@ export type $UserProfilePayload<ExtArgs extends runtime.Types.Extensions.Interna
     theme: $Enums.Theme
     timezone: string
     notifyBudgetWarningPct: number
+    weekStartsOn: number
+    dateFormat: string
+    defaultTransactionType: $Enums.TransactionType
+    pushSubscription: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userProfile"]>
@@ -1058,6 +1192,10 @@ export interface UserProfileFieldRefs {
   readonly theme: Prisma.FieldRef<"UserProfile", 'Theme'>
   readonly timezone: Prisma.FieldRef<"UserProfile", 'String'>
   readonly notifyBudgetWarningPct: Prisma.FieldRef<"UserProfile", 'Int'>
+  readonly weekStartsOn: Prisma.FieldRef<"UserProfile", 'Int'>
+  readonly dateFormat: Prisma.FieldRef<"UserProfile", 'String'>
+  readonly defaultTransactionType: Prisma.FieldRef<"UserProfile", 'TransactionType'>
+  readonly pushSubscription: Prisma.FieldRef<"UserProfile", 'String'>
   readonly createdAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserProfile", 'DateTime'>
 }
