@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, Filter } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faDownload, faFilter } from "@fortawesome/free-solid-svg-icons";
 import TransactionTable from "./TransactionTable";
 
 function formatCurrency(amount: number, currency = "NPR") {
@@ -82,13 +83,13 @@ export default async function TransactionsPage({
             download
           >
             <Button variant="outline" size="sm" className="gap-1.5">
-              <Download className="h-3.5 w-3.5" />
+              <FontAwesomeIcon icon={faDownload} className="h-3.5 w-3.5" />
               Export CSV
             </Button>
           </a>
           <Link href="/dashboard/transactions?add=1">
             <Button size="sm" className="gap-1.5">
-              <Plus className="h-3.5 w-3.5" />
+              <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
               Add Transaction
             </Button>
           </Link>

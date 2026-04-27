@@ -3,20 +3,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  LayoutDashboard,
-  ArrowLeftRight,
-  Wallet,
-  BarChart3,
-  Sparkles,
-  CreditCard,
-  Bell,
-  Download,
-  Settings,
-  Gem,
-  ChevronsUpDown,
-  LogOut,
-} from "lucide-react";
+  faGauge,
+  faArrowRightArrowLeft,
+  faWallet,
+  faChartBar,
+  faWandMagicSparkles,
+  faCreditCard,
+  faBell,
+  faDownload,
+  faGear,
+  faGem,
+  faUpDown,
+  faRightFromBracket,
+  type IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
 
 import {
   Sidebar,
@@ -46,34 +48,58 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // ─── Nav config ────────────────────────────────────────────────────────────────
 
-const NAV_SECTIONS = [
+const NAV_SECTIONS: {
+  label: string;
+  items: {
+    title: string;
+    href: string;
+    icon: IconDefinition;
+    exact?: boolean;
+  }[];
+}[] = [
   {
     label: "PRIMARY",
     items: [
-      { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
-      { title: "Transactions", href: "/dashboard/transactions", icon: ArrowLeftRight },
-      { title: "Budgets", href: "/dashboard/budgets", icon: Wallet },
+      { title: "Dashboard", href: "/dashboard", icon: faGauge, exact: true },
+      {
+        title: "Transactions",
+        href: "/dashboard/transactions",
+        icon: faArrowRightArrowLeft,
+      },
+      { title: "Budgets", href: "/dashboard/budgets", icon: faWallet },
     ],
   },
   {
     label: "INSIGHTS",
     items: [
-      { title: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-      { title: "AI Insights", href: "/dashboard/ai-insights", icon: Sparkles },
+      { title: "Analytics", href: "/dashboard/analytics", icon: faChartBar },
+      {
+        title: "AI Insights",
+        href: "/dashboard/ai-insights",
+        icon: faWandMagicSparkles,
+      },
     ],
   },
   {
     label: "MANAGEMENT",
     items: [
-      { title: "Payment Methods", href: "/dashboard/payment-methods", icon: CreditCard },
-      { title: "Notifications", href: "/dashboard/notifications", icon: Bell },
+      {
+        title: "Payment Methods",
+        href: "/dashboard/payment-methods",
+        icon: faCreditCard,
+      },
+      {
+        title: "Notifications",
+        href: "/dashboard/notifications",
+        icon: faBell,
+      },
     ],
   },
   {
     label: "SYSTEM",
     items: [
-      { title: "Data Export", href: "/dashboard/export", icon: Download },
-      { title: "Settings", href: "/dashboard/settings", icon: Settings },
+      { title: "Data Export", href: "/dashboard/export", icon: faDownload },
+      { title: "Settings", href: "/dashboard/settings", icon: faGear },
     ],
   },
 ];
@@ -105,11 +131,15 @@ export function AppSidebar({ user }: AppSidebarProps) {
               tooltip="FinanceAI"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0">
-                <Gem className="size-4" />
+                <FontAwesomeIcon icon={faGem} className="size-4" />
               </div>
               <div className="flex flex-col gap-0.5 leading-none">
-                <span className="font-semibold text-sm tracking-tight">FinanceAI</span>
-                <span className="text-[10px] text-muted-foreground">Personal Finance</span>
+                <span className="font-semibold text-sm tracking-tight">
+                  FinanceAI
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  Personal Finance
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -117,21 +147,25 @@ export function AppSidebar({ user }: AppSidebarProps) {
       </SidebarHeader>
 
       {/* ── Content / Nav sections ── */}
-      <SidebarContent>
+      <SidebarContent className="">
         {NAV_SECTIONS.map((section, i) => (
-          <SidebarGroup key={section.label}>
+          <SidebarGroup key={section.label} className="">
             <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="gap-2">
                 {section.items.map((item) => {
                   const isActive = item.exact
                     ? pathname === item.href
                     : pathname.startsWith(item.href);
                   return (
-                    <SidebarMenuItem key={item.href}>
-                      <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                        <Link href={item.href}>
-                          <item.icon />
+                    <SidebarMenuItem key={item.href} className="">
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        tooltip={item.title}
+                      >
+                        <Link href={item.href} className="h-12 px-6">
+                          <FontAwesomeIcon icon={item.icon} />
                           <span>{item.title}</span>
                         </Link>
                       </SidebarMenuButton>
@@ -163,14 +197,26 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col gap-0.5 leading-none text-left">
-                    <span className="text-xs font-semibold truncate">{user.name}</span>
-                    <span className="text-[10px] text-muted-foreground truncate">{user.email}</span>
+                    <span className="text-xs font-semibold truncate">
+                      {user.name}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {user.email}
+                    </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-3.5 text-muted-foreground" />
+                  <FontAwesomeIcon
+                    icon={faUpDown}
+                    className="ml-auto size-3.5 text-muted-foreground"
+                  />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-56">
+              <DropdownMenuContent
+                side="top"
+                align="start"
+                sideOffset={8}
+                className="w-56"
+              >
                 <DropdownMenuLabel className="font-normal p-2">
                   <div className="flex items-center gap-2">
                     <Avatar className="size-8 rounded-lg">
@@ -181,14 +227,19 @@ export function AppSidebar({ user }: AppSidebarProps) {
                     </Avatar>
                     <div className="flex flex-col gap-0.5">
                       <span className="text-sm font-semibold">{user.name}</span>
-                      <span className="text-xs text-muted-foreground">{user.email}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {user.email}
+                      </span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard/settings" className="gap-2 cursor-pointer">
-                    <Settings className="size-3.5" />
+                  <Link
+                    href="/dashboard/settings"
+                    className="gap-2 cursor-pointer"
+                  >
+                    <FontAwesomeIcon icon={faGear} className="size-3.5" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
@@ -197,7 +248,10 @@ export function AppSidebar({ user }: AppSidebarProps) {
                   onClick={() => signOut({ callbackUrl: "/" })}
                   className="gap-2 cursor-pointer text-destructive focus:text-destructive"
                 >
-                  <LogOut className="size-3.5" />
+                  <FontAwesomeIcon
+                    icon={faRightFromBracket}
+                    className="size-3.5"
+                  />
                   Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>

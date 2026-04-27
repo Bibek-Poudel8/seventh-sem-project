@@ -152,21 +152,21 @@ model User {
 }
 
 model UserProfile {
-  id                     String   @id @default(cuid())
-  userId                 String   @unique
-  currency               String   @default("NPR") // ISO 4217 currency code
-  locale                 String   @default("en-US") // BCP 47 locale
-  theme                  Theme    @default(SYSTEM)
-  timezone               String   @default("UTC") // IANA timezone string
-  notifyBudgetWarningPct Int      @default(80) // Warn at X% of budget used
+  id                     String          @id @default(cuid())
+  userId                 String          @unique
+  currency               String          @default("NPR") // ISO 4217 currency code
+  locale                 String          @default("en-US") // BCP 47 locale
+  theme                  Theme           @default(SYSTEM)
+  timezone               String          @default("UTC") // IANA timezone string
+  notifyBudgetWarningPct Int             @default(80) // Warn at X% of budget used
   // User preferences
-  weekStartsOn           Int      @default(1) // 0=Sunday, 1=Monday
-  dateFormat             String   @default("DD/MM/YYYY")
+  weekStartsOn           Int             @default(1) // 0=Sunday, 1=Monday
+  dateFormat             String          @default("DD/MM/YYYY")
   defaultTransactionType TransactionType @default(EXPENSE)
   // Push notification subscription (JSON string)
-  pushSubscription       String?  @db.Text
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  pushSubscription       String?         @db.Text
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -251,13 +251,12 @@ model Transaction {
   aiConfidenceScore Float? // Optional confidence score (0.0 – 1.0)
 
   // Anomaly Detection 
-  isAnomaly      Boolean @default(false)
-  anomalyScore   Float?  // 0.0 – 1.0, higher = more anomalous
-  anomalyReason  String? // e.g., "3x higher than usual food spending"
-
+  isAnomaly     Boolean   @default(false)
+  anomalyScore  Float? // 0.0 – 1.0, higher = more anomalous
+  anomalyReason String? // e.g., "3x higher than usual food spending"
   // Soft delete support
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
