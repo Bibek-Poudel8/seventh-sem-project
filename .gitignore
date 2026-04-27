@@ -43,3 +43,14 @@ next-env.d.ts
 /prisma/src/generated/prisma
 
 /prisma/src/generated/prisma
+
+.env.local
+ml/venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ML models (large binary files)
+ml/models/*.pkl
