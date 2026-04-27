@@ -254,6 +254,7 @@ model Transaction {
   isAnomaly     Boolean   @default(false)
   anomalyScore  Float? // 0.0 – 1.0, higher = more anomalous
   anomalyReason String? // e.g., "3x higher than usual food spending"
+
   // Soft delete support
   isDeleted     Boolean   @default(false)
   deletedAt     DateTime?
