@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, AlertTriangle, TrendingUp } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTriangleExclamation, faArrowTrendUp } from "@fortawesome/free-solid-svg-icons";
 import { CircularProgress } from "@/components/ui/CircularProgress";
 import BudgetActions from "./BudgetActions";
 
@@ -82,7 +83,7 @@ export default async function BudgetsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-              <TrendingUp className="h-8 w-8 text-muted-foreground" />
+              <FontAwesomeIcon icon={faArrowTrendUp} className="h-8 w-8 text-muted-foreground" />
             </div>
             <div className="text-center">
               <p className="font-semibold">No budgets yet</p>

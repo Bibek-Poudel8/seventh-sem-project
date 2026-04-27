@@ -24,7 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, MoreVertical, Pencil, Trash2, Loader2 } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faEllipsisVertical, faPencil, faTrashCan, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { createBudget, deleteBudget, BudgetActionState } from "./actions";
 
 interface Category {
@@ -135,7 +136,7 @@ function BudgetForm({
       </div>
       <div className="flex justify-end">
         <Button type="submit" disabled={pending} className="gap-1.5">
-          {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+          {pending && <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />}
           {mode === "create" ? "Create Budget" : "Save Changes"}
         </Button>
       </div>
@@ -151,7 +152,7 @@ export default function BudgetActions({ categories, currency, mode, budget }: Pr
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button size="sm" className="gap-1.5">
-            <Plus className="h-3.5 w-3.5" /> Create Budget
+            <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" /> Create Budget
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-md">
@@ -172,14 +173,14 @@ export default function BudgetActions({ categories, currency, mode, budget }: Pr
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-7 w-7">
-          <MoreVertical className="h-4 w-4" />
+          <FontAwesomeIcon icon={faEllipsisVertical} className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setOpen(true); }} className="gap-2">
-              <Pencil className="h-3.5 w-3.5" /> Edit
+              <FontAwesomeIcon icon={faPencil} className="h-3.5 w-3.5" /> Edit
             </DropdownMenuItem>
           </DialogTrigger>
           <DialogContent className="max-w-md">
@@ -200,7 +201,7 @@ export default function BudgetActions({ categories, currency, mode, budget }: Pr
             if (budget && confirm("Delete this budget?")) deleteBudget(budget.id);
           }}
         >
-          <Trash2 className="h-3.5 w-3.5" /> Delete
+          <FontAwesomeIcon icon={faTrashCan} className="h-3.5 w-3.5" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, CheckCircle } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
 const CURRENCIES = ["NPR","USD","EUR","GBP","INR","JPY","AUD","CAD","SGD","CNY"];
 const TIMEZONES = ["UTC","Asia/Kathmandu","Asia/Kolkata","Asia/Tokyo","Europe/London","America/New_York","America/Los_Angeles","Australia/Sydney"];
@@ -20,7 +21,7 @@ export default function ProfileTab({ user, profile }: { user: { name: string | n
         <form action={action} className="space-y-4">
           {state?.success && (
             <div className="flex items-center gap-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-3 py-2 text-sm text-emerald-600">
-              <CheckCircle className="h-4 w-4" /> Profile updated successfully
+              <FontAwesomeIcon icon={faCircleCheck} className="h-4 w-4" /> Profile updated successfully
             </div>
           )}
           <div className="space-y-1.5">
@@ -51,7 +52,7 @@ export default function ProfileTab({ user, profile }: { user: { name: string | n
           </div>
           <div className="flex justify-end">
             <Button type="submit" disabled={pending} className="gap-1.5">
-              {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Save Changes
+              {pending && <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />} Save Changes
             </Button>
           </div>
         </form>

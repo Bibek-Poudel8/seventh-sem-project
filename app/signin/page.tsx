@@ -6,7 +6,8 @@ import { login, AuthState } from "@/app/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Gem, Loader2 } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGem, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -25,7 +26,7 @@ function LoginForm() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500 shadow-lg shadow-indigo-500/30">
-            <Gem className="h-6 w-6 text-white" />
+            <FontAwesomeIcon icon={faGem} className="h-6 w-6 text-white" />
           </div>
           <div className="text-center">
             <h1 className="text-2xl font-bold text-white">Welcome back</h1>
@@ -87,7 +88,7 @@ function LoginForm() {
               className="w-full bg-indigo-500 hover:bg-indigo-400 text-white font-medium shadow-lg shadow-indigo-500/20"
             >
               {pending ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</>
+                <><FontAwesomeIcon icon={faSpinner} className="mr-2 h-4 w-4 animate-spin" /> Signing in...</>
               ) : (
                 "Sign in"
               )}

@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Loader2, CheckCircle } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner, faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 interface Profile {
@@ -28,7 +29,7 @@ export default function PreferencesTab({ profile }: { profile: Profile | null })
         <form action={action} className="space-y-5">
           {state?.success && (
             <div className="flex items-center gap-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-3 py-2 text-sm text-emerald-600">
-              <CheckCircle className="h-4 w-4" /> Preferences saved
+              <FontAwesomeIcon icon={faCircleCheck} className="h-4 w-4" /> Preferences saved
             </div>
           )}
           <div className="grid grid-cols-2 gap-4">
@@ -88,7 +89,7 @@ export default function PreferencesTab({ profile }: { profile: Profile | null })
           </div>
           <div className="flex justify-end">
             <Button type="submit" disabled={pending} className="gap-1.5">
-              {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Save Preferences
+              {pending && <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />} Save Preferences
             </Button>
           </div>
         </form>

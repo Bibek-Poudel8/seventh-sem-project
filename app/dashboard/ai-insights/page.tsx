@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
 
 export default async function AIInsightsPage() {
   const session = await auth();
@@ -17,7 +18,7 @@ export default async function AIInsightsPage() {
       <Card className="bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-purple-500/5 border-indigo-500/20">
         <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
           <div className="h-14 w-14 rounded-full bg-indigo-500/15 flex items-center justify-center">
-            <Sparkles className="h-7 w-7 text-indigo-500" />
+            <FontAwesomeIcon icon={faWandMagicSparkles} className="h-7 w-7 text-indigo-500" />
           </div>
           <div className="text-center">
             <p className="font-semibold">AI Engine Not Connected</p>

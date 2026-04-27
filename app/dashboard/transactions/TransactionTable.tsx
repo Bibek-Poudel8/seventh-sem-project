@@ -21,17 +21,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  ArrowUpDown,
-  Loader2,
-  X,
-} from "lucide-react";
+  faPlus,
+  faPencil,
+  faTrashCan,
+  faChevronLeft,
+  faChevronRight,
+  faMagnifyingGlass,
+  faArrowsUpDown,
+  faSpinner,
+  faXmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 import { createTransaction, deleteTransaction, TransactionActionState } from "./actions";
 
@@ -143,7 +144,7 @@ function TransactionForm({
       </div>
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={pending} className="gap-1.5">
-          {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+          {pending ? <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" /> : <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />}
           Add Transaction
         </Button>
       </div>
@@ -193,7 +194,7 @@ export default function TransactionTable({
       {/* Filter Bar */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <FontAwesomeIcon icon={faMagnifyingGlass} className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             placeholder="Search transactions..."
             defaultValue={searchParams.keyword}
@@ -247,14 +248,14 @@ export default function TransactionTable({
             onClick={() => router.push(pathname)}
             className="h-8 gap-1 text-muted-foreground"
           >
-            <X className="h-3.5 w-3.5" /> Clear
+            <FontAwesomeIcon icon={faXmark} className="h-3.5 w-3.5" /> Clear
           </Button>
         )}
         <div className="ml-auto">
           <Dialog open={addOpen} onOpenChange={setAddOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="h-8 gap-1.5">
-                <Plus className="h-3.5 w-3.5" /> Add
+                <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" /> Add
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
@@ -357,7 +358,7 @@ export default function TransactionTable({
                           onClick={() => handleDelete(tx.id)}
                           disabled={isPending}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
+                          <FontAwesomeIcon icon={faTrashCan} className="h-3.5 w-3.5" />
                         </Button>
                       </div>
                     </td>
@@ -383,7 +384,7 @@ export default function TransactionTable({
               disabled={page <= 1}
               onClick={() => updateParam("page", String(page - 1))}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <FontAwesomeIcon icon={faChevronLeft} className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
@@ -392,7 +393,7 @@ export default function TransactionTable({
               disabled={page >= totalPages}
               onClick={() => updateParam("page", String(page + 1))}
             >
-              <ChevronRight className="h-4 w-4" />
+              <FontAwesomeIcon icon={faChevronRight} className="h-4 w-4" />
             </Button>
           </div>
         </div>

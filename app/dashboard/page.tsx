@@ -1,16 +1,17 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  PiggyBank,
-  Sparkles,
-  ArrowRight,
-  AlertTriangle,
-  Clock,
-} from "lucide-react";
+  faArrowTrendUp,
+  faArrowTrendDown,
+  faWallet,
+  faPiggyBank,
+  faWandMagicSparkles,
+  faArrowRight,
+  faTriangleExclamation,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -39,7 +40,7 @@ function DeltaBadge({ delta }: { delta: number }) {
         delta > 0 ? "text-emerald-500" : "text-red-500"
       )}
     >
-      {delta > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+      {delta > 0 ? <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3" /> : <FontAwesomeIcon icon={faArrowTrendDown} className="h-3 w-3" />}
       {Math.abs(delta)}% from last month
     </span>
   );
@@ -76,7 +77,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-muted-foreground font-medium">Net Balance</span>
               <div className={cn("p-1.5 rounded-lg", summary.netBalance >= 0 ? "bg-emerald-500/10" : "bg-red-500/10")}>
-                <Wallet className={cn("h-4 w-4", summary.netBalance >= 0 ? "text-emerald-500" : "text-red-500")} />
+                <FontAwesomeIcon icon={faWallet} className={cn("h-4 w-4", summary.netBalance >= 0 ? "text-emerald-500" : "text-red-500")} />
               </div>
             </div>
             <p className={cn("text-2xl font-bold", summary.netBalance >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
@@ -92,7 +93,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-muted-foreground font-medium">Income</span>
               <div className="p-1.5 rounded-lg bg-emerald-500/10">
-                <TrendingUp className="h-4 w-4 text-emerald-500" />
+                <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 text-emerald-500" />
               </div>
             </div>
             <p className="text-2xl font-bold">{formatCurrency(summary.totalIncome, currency)}</p>
@@ -106,7 +107,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-muted-foreground font-medium">Expenses</span>
               <div className="p-1.5 rounded-lg bg-red-500/10">
-                <TrendingDown className="h-4 w-4 text-red-500" />
+                <FontAwesomeIcon icon={faArrowTrendDown} className="h-4 w-4 text-red-500" />
               </div>
             </div>
             <p className="text-2xl font-bold">{formatCurrency(summary.totalExpenses, currency)}</p>
@@ -120,7 +121,7 @@ export default async function DashboardPage() {
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-muted-foreground font-medium">Savings Rate</span>
               <div className="p-1.5 rounded-lg bg-violet-500/10">
-                <PiggyBank className="h-4 w-4 text-violet-500" />
+                <FontAwesomeIcon icon={faPiggyBank} className="h-4 w-4 text-violet-500" />
               </div>
             </div>
             <p className={cn("text-2xl font-bold", summary.savingsRate >= 30 ? "text-emerald-600 dark:text-emerald-400" : summary.savingsRate >= 15 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400")}>
@@ -159,7 +160,7 @@ export default async function DashboardPage() {
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold">Budget Progress</CardTitle>
             <Link href="/dashboard/budgets" className="text-xs text-primary hover:underline flex items-center gap-1">
-              View all <ArrowRight className="h-3 w-3" />
+              View all <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
             </Link>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -179,7 +180,7 @@ export default async function DashboardPage() {
                     <div className="flex items-center justify-between mb-1.5">
                       <span className="text-sm font-medium">{budget.category.name}</span>
                       <div className="flex items-center gap-2">
-                        {pct >= 100 && <AlertTriangle className="h-3.5 w-3.5 text-red-500" />}
+                        {pct >= 100 && <FontAwesomeIcon icon={faTriangleExclamation} className="h-3.5 w-3.5 text-red-500" />}
                         <span className="text-xs text-muted-foreground">
                           {formatCurrency(budget.spent, currency)} / {formatCurrency(Number(budget.amountLimit), currency)}
                         </span>
@@ -203,14 +204,14 @@ export default async function DashboardPage() {
         <Card className="bg-gradient-to-br from-indigo-500/10 via-violet-500/10 to-purple-500/5 border-indigo-500/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo-500" />
+              <FontAwesomeIcon icon={faWandMagicSparkles} className="h-4 w-4 text-indigo-500" />
               AI Insights
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
               <div className="h-10 w-10 rounded-full bg-indigo-500/15 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-indigo-400" />
+                <FontAwesomeIcon icon={faWandMagicSparkles} className="h-5 w-5 text-indigo-400" />
               </div>
               <div>
                 <p className="text-sm font-medium">AI insights unavailable</p>
@@ -228,7 +229,7 @@ export default async function DashboardPage() {
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-semibold">Recent Transactions</CardTitle>
           <Link href="/dashboard/transactions" className="text-xs text-primary hover:underline flex items-center gap-1">
-            View all <ArrowRight className="h-3 w-3" />
+            View all <FontAwesomeIcon icon={faArrowRight} className="h-3 w-3" />
           </Link>
         </CardHeader>
         <CardContent>
@@ -262,7 +263,7 @@ export default async function DashboardPage() {
                         {tx.category?.name ?? "Uncategorized"}
                       </Badge>
                       <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                        <Clock className="h-2.5 w-2.5" />
+                        <FontAwesomeIcon icon={faClock} className="h-2.5 w-2.5" />
                         {new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
                     </div>

@@ -3,7 +3,8 @@ import { auth } from "@/auth";
 import { getUserNotifications } from "@/services/notification.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, BellOff } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell, faBellSlash } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 
 function timeAgo(date: Date) {
@@ -36,7 +37,7 @@ export default async function NotificationsPage() {
       {notifications.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-            <BellOff className="h-10 w-10 text-muted-foreground" />
+            <FontAwesomeIcon icon={faBellSlash} className="h-10 w-10 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">No notifications yet</p>
           </CardContent>
         </Card>
@@ -46,7 +47,7 @@ export default async function NotificationsPage() {
             <Card key={n.id} className={cn(!n.isRead && "border-primary/30 bg-primary/5")}>
               <CardContent className="flex items-start gap-3 p-4">
                 <div className={cn("p-2 rounded-lg shrink-0", TYPE_COLORS[n.type] ?? "bg-muted text-muted-foreground")}>
-                  <Bell className="h-3.5 w-3.5" />
+                  <FontAwesomeIcon icon={faBell} className="h-3.5 w-3.5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
