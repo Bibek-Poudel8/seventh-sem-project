@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCreditCard } from "@fortawesome/free-solid-svg-icons";
 
 export default async function PaymentMethodsPage() {
   const session = await auth();
@@ -16,7 +17,7 @@ export default async function PaymentMethodsPage() {
       </div>
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-          <CreditCard className="h-10 w-10 text-muted-foreground" />
+          <FontAwesomeIcon icon={faCreditCard} className="h-10 w-10 text-muted-foreground" />
           <div className="text-center">
             <p className="font-semibold">Payment Methods</p>
             <p className="text-sm text-muted-foreground mt-1">Track multiple accounts and wallets</p>

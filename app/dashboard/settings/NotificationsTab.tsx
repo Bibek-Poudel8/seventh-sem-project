@@ -2,7 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
 
 const NOTIFICATIONS = [
   { id: "budget_exceeded", label: "Budget limit reached", description: "Alert when you exceed a budget" },
@@ -17,7 +18,7 @@ export default function NotificationsTab({ profile }: { profile: unknown }) {
     <Card>
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <Bell className="h-4 w-4" /> Notification Preferences
+          <FontAwesomeIcon icon={faBell} className="h-4 w-4" /> Notification Preferences
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

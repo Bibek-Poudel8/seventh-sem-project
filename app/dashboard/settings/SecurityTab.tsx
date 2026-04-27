@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, CheckCircle, ShieldCheck, Lock } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner, faCircleCheck, faShieldHalved, faLock } from "@fortawesome/free-solid-svg-icons";
 
 export default function SecurityTab({ hasPassword, providers }: { hasPassword: boolean; providers: string[] }) {
   const [state, action, pending] = useActionState(changePassword, undefined);
@@ -15,7 +16,7 @@ export default function SecurityTab({ hasPassword, providers }: { hasPassword: b
       {/* Connected providers */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2"><ShieldCheck className="h-4 w-4" /> Connected Accounts</CardTitle>
+          <CardTitle className="text-base flex items-center gap-2"><FontAwesomeIcon icon={faShieldHalved} className="h-4 w-4" /> Connected Accounts</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           {providers.length === 0
@@ -34,13 +35,13 @@ export default function SecurityTab({ hasPassword, providers }: { hasPassword: b
       {hasPassword && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2"><Lock className="h-4 w-4" /> Change Password</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2"><FontAwesomeIcon icon={faLock} className="h-4 w-4" /> Change Password</CardTitle>
           </CardHeader>
           <CardContent>
             <form action={action} className="space-y-4">
               {state?.success && (
                 <div className="flex items-center gap-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 px-3 py-2 text-sm text-emerald-600">
-                  <CheckCircle className="h-4 w-4" /> Password changed successfully
+                  <FontAwesomeIcon icon={faCircleCheck} className="h-4 w-4" /> Password changed successfully
                 </div>
               )}
               {state?.message && (
@@ -55,7 +56,7 @@ export default function SecurityTab({ hasPassword, providers }: { hasPassword: b
               ))}
               <div className="flex justify-end">
                 <Button type="submit" disabled={pending} className="gap-1.5">
-                  {pending && <Loader2 className="h-3.5 w-3.5 animate-spin" />} Update Password
+                  {pending && <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />} Update Password
                 </Button>
               </div>
             </form>
