@@ -29,11 +29,13 @@ export type AggregateTransaction = {
 export type TransactionAvgAggregateOutputType = {
   amount: runtime.Decimal | null
   aiConfidenceScore: number | null
+  anomalyScore: number | null
 }
 
 export type TransactionSumAggregateOutputType = {
   amount: runtime.Decimal | null
   aiConfidenceScore: number | null
+  anomalyScore: number | null
 }
 
 export type TransactionMinAggregateOutputType = {
@@ -50,6 +52,9 @@ export type TransactionMinAggregateOutputType = {
   isAiCategorized: boolean | null
   aiCategoryRaw: string | null
   aiConfidenceScore: number | null
+  isAnomaly: boolean | null
+  anomalyScore: number | null
+  anomalyReason: string | null
   isDeleted: boolean | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -70,6 +75,9 @@ export type TransactionMaxAggregateOutputType = {
   isAiCategorized: boolean | null
   aiCategoryRaw: string | null
   aiConfidenceScore: number | null
+  isAnomaly: boolean | null
+  anomalyScore: number | null
+  anomalyReason: string | null
   isDeleted: boolean | null
   deletedAt: Date | null
   createdAt: Date | null
@@ -90,6 +98,9 @@ export type TransactionCountAggregateOutputType = {
   isAiCategorized: number
   aiCategoryRaw: number
   aiConfidenceScore: number
+  isAnomaly: number
+  anomalyScore: number
+  anomalyReason: number
   isDeleted: number
   deletedAt: number
   createdAt: number
@@ -101,11 +112,13 @@ export type TransactionCountAggregateOutputType = {
 export type TransactionAvgAggregateInputType = {
   amount?: true
   aiConfidenceScore?: true
+  anomalyScore?: true
 }
 
 export type TransactionSumAggregateInputType = {
   amount?: true
   aiConfidenceScore?: true
+  anomalyScore?: true
 }
 
 export type TransactionMinAggregateInputType = {
@@ -122,6 +135,9 @@ export type TransactionMinAggregateInputType = {
   isAiCategorized?: true
   aiCategoryRaw?: true
   aiConfidenceScore?: true
+  isAnomaly?: true
+  anomalyScore?: true
+  anomalyReason?: true
   isDeleted?: true
   deletedAt?: true
   createdAt?: true
@@ -142,6 +158,9 @@ export type TransactionMaxAggregateInputType = {
   isAiCategorized?: true
   aiCategoryRaw?: true
   aiConfidenceScore?: true
+  isAnomaly?: true
+  anomalyScore?: true
+  anomalyReason?: true
   isDeleted?: true
   deletedAt?: true
   createdAt?: true
@@ -162,6 +181,9 @@ export type TransactionCountAggregateInputType = {
   isAiCategorized?: true
   aiCategoryRaw?: true
   aiConfidenceScore?: true
+  isAnomaly?: true
+  anomalyScore?: true
+  anomalyReason?: true
   isDeleted?: true
   deletedAt?: true
   createdAt?: true
@@ -269,6 +291,9 @@ export type TransactionGroupByOutputType = {
   isAiCategorized: boolean
   aiCategoryRaw: string | null
   aiConfidenceScore: number | null
+  isAnomaly: boolean
+  anomalyScore: number | null
+  anomalyReason: string | null
   isDeleted: boolean
   deletedAt: Date | null
   createdAt: Date
@@ -280,7 +305,7 @@ export type TransactionGroupByOutputType = {
   _max: TransactionMaxAggregateOutputType | null
 }
 
-type GetTransactionGroupByPayload<T extends TransactionGroupByArgs> = Prisma.PrismaPromise<
+export type GetTransactionGroupByPayload<T extends TransactionGroupByArgs> = Prisma.PrismaPromise<
   Array<
     Prisma.PickEnumerable<TransactionGroupByOutputType, T['by']> &
       {
@@ -312,6 +337,9 @@ export type TransactionWhereInput = {
   isAiCategorized?: Prisma.BoolFilter<"Transaction"> | boolean
   aiCategoryRaw?: Prisma.StringNullableFilter<"Transaction"> | string | null
   aiConfidenceScore?: Prisma.FloatNullableFilter<"Transaction"> | number | null
+  isAnomaly?: Prisma.BoolFilter<"Transaction"> | boolean
+  anomalyScore?: Prisma.FloatNullableFilter<"Transaction"> | number | null
+  anomalyReason?: Prisma.StringNullableFilter<"Transaction"> | string | null
   isDeleted?: Prisma.BoolFilter<"Transaction"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
@@ -336,6 +364,9 @@ export type TransactionOrderByWithRelationInput = {
   isAiCategorized?: Prisma.SortOrder
   aiCategoryRaw?: Prisma.SortOrderInput | Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAnomaly?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  anomalyReason?: Prisma.SortOrderInput | Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -363,6 +394,9 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   isAiCategorized?: Prisma.BoolFilter<"Transaction"> | boolean
   aiCategoryRaw?: Prisma.StringNullableFilter<"Transaction"> | string | null
   aiConfidenceScore?: Prisma.FloatNullableFilter<"Transaction"> | number | null
+  isAnomaly?: Prisma.BoolFilter<"Transaction"> | boolean
+  anomalyScore?: Prisma.FloatNullableFilter<"Transaction"> | number | null
+  anomalyReason?: Prisma.StringNullableFilter<"Transaction"> | string | null
   isDeleted?: Prisma.BoolFilter<"Transaction"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
@@ -387,6 +421,9 @@ export type TransactionOrderByWithAggregationInput = {
   isAiCategorized?: Prisma.SortOrder
   aiCategoryRaw?: Prisma.SortOrderInput | Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAnomaly?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrderInput | Prisma.SortOrder
+  anomalyReason?: Prisma.SortOrderInput | Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -415,6 +452,9 @@ export type TransactionScalarWhereWithAggregatesInput = {
   isAiCategorized?: Prisma.BoolWithAggregatesFilter<"Transaction"> | boolean
   aiCategoryRaw?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   aiConfidenceScore?: Prisma.FloatNullableWithAggregatesFilter<"Transaction"> | number | null
+  isAnomaly?: Prisma.BoolWithAggregatesFilter<"Transaction"> | boolean
+  anomalyScore?: Prisma.FloatNullableWithAggregatesFilter<"Transaction"> | number | null
+  anomalyReason?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   isDeleted?: Prisma.BoolWithAggregatesFilter<"Transaction"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Transaction"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Transaction"> | Date | string
@@ -431,6 +471,9 @@ export type TransactionCreateInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -455,6 +498,9 @@ export type TransactionUncheckedCreateInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -471,6 +517,9 @@ export type TransactionUpdateInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -495,6 +544,9 @@ export type TransactionUncheckedUpdateInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -515,6 +567,9 @@ export type TransactionCreateManyInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -531,6 +586,9 @@ export type TransactionUpdateManyMutationInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -551,6 +609,9 @@ export type TransactionUncheckedUpdateManyInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -581,6 +642,9 @@ export type TransactionCountOrderByAggregateInput = {
   isAiCategorized?: Prisma.SortOrder
   aiCategoryRaw?: Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrder
+  isAnomaly?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrder
+  anomalyReason?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -590,6 +654,7 @@ export type TransactionCountOrderByAggregateInput = {
 export type TransactionAvgOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrder
 }
 
 export type TransactionMaxOrderByAggregateInput = {
@@ -606,6 +671,9 @@ export type TransactionMaxOrderByAggregateInput = {
   isAiCategorized?: Prisma.SortOrder
   aiCategoryRaw?: Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrder
+  isAnomaly?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrder
+  anomalyReason?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -626,6 +694,9 @@ export type TransactionMinOrderByAggregateInput = {
   isAiCategorized?: Prisma.SortOrder
   aiCategoryRaw?: Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrder
+  isAnomaly?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrder
+  anomalyReason?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -635,6 +706,7 @@ export type TransactionMinOrderByAggregateInput = {
 export type TransactionSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   aiConfidenceScore?: Prisma.SortOrder
+  anomalyScore?: Prisma.SortOrder
 }
 
 export type TransactionCreateNestedManyWithoutUserInput = {
@@ -831,6 +903,9 @@ export type TransactionCreateWithoutUserInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -853,6 +928,9 @@ export type TransactionUncheckedCreateWithoutUserInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -902,6 +980,9 @@ export type TransactionScalarWhereInput = {
   isAiCategorized?: Prisma.BoolFilter<"Transaction"> | boolean
   aiCategoryRaw?: Prisma.StringNullableFilter<"Transaction"> | string | null
   aiConfidenceScore?: Prisma.FloatNullableFilter<"Transaction"> | number | null
+  isAnomaly?: Prisma.BoolFilter<"Transaction"> | boolean
+  anomalyScore?: Prisma.FloatNullableFilter<"Transaction"> | number | null
+  anomalyReason?: Prisma.StringNullableFilter<"Transaction"> | string | null
   isDeleted?: Prisma.BoolFilter<"Transaction"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Transaction"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Transaction"> | Date | string
@@ -918,6 +999,9 @@ export type TransactionCreateWithoutCategoryInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -940,6 +1024,9 @@ export type TransactionUncheckedCreateWithoutCategoryInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -982,6 +1069,9 @@ export type TransactionCreateWithoutPaymentMethodInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1004,6 +1094,9 @@ export type TransactionUncheckedCreateWithoutPaymentMethodInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1046,6 +1139,9 @@ export type TransactionCreateWithoutRecurringTransactionInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1068,6 +1164,9 @@ export type TransactionUncheckedCreateWithoutRecurringTransactionInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1113,6 +1212,9 @@ export type TransactionCreateManyUserInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1129,6 +1231,9 @@ export type TransactionUpdateWithoutUserInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1151,6 +1256,9 @@ export type TransactionUncheckedUpdateWithoutUserInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1170,6 +1278,9 @@ export type TransactionUncheckedUpdateManyWithoutUserInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1189,6 +1300,9 @@ export type TransactionCreateManyCategoryInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1205,6 +1319,9 @@ export type TransactionUpdateWithoutCategoryInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1227,6 +1344,9 @@ export type TransactionUncheckedUpdateWithoutCategoryInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1246,6 +1366,9 @@ export type TransactionUncheckedUpdateManyWithoutCategoryInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1265,6 +1388,9 @@ export type TransactionCreateManyPaymentMethodInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1281,6 +1407,9 @@ export type TransactionUpdateWithoutPaymentMethodInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1303,6 +1432,9 @@ export type TransactionUncheckedUpdateWithoutPaymentMethodInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1322,6 +1454,9 @@ export type TransactionUncheckedUpdateManyWithoutPaymentMethodInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1341,6 +1476,9 @@ export type TransactionCreateManyRecurringTransactionInput = {
   isAiCategorized?: boolean
   aiCategoryRaw?: string | null
   aiConfidenceScore?: number | null
+  isAnomaly?: boolean
+  anomalyScore?: number | null
+  anomalyReason?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   createdAt?: Date | string
@@ -1357,6 +1495,9 @@ export type TransactionUpdateWithoutRecurringTransactionInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1379,6 +1520,9 @@ export type TransactionUncheckedUpdateWithoutRecurringTransactionInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1398,6 +1542,9 @@ export type TransactionUncheckedUpdateManyWithoutRecurringTransactionInput = {
   isAiCategorized?: Prisma.BoolFieldUpdateOperationsInput | boolean
   aiCategoryRaw?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   aiConfidenceScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  isAnomaly?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  anomalyScore?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  anomalyReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1420,6 +1567,9 @@ export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   isAiCategorized?: boolean
   aiCategoryRaw?: boolean
   aiConfidenceScore?: boolean
+  isAnomaly?: boolean
+  anomalyScore?: boolean
+  anomalyReason?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -1444,6 +1594,9 @@ export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   isAiCategorized?: boolean
   aiCategoryRaw?: boolean
   aiConfidenceScore?: boolean
+  isAnomaly?: boolean
+  anomalyScore?: boolean
+  anomalyReason?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -1468,6 +1621,9 @@ export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   isAiCategorized?: boolean
   aiCategoryRaw?: boolean
   aiConfidenceScore?: boolean
+  isAnomaly?: boolean
+  anomalyScore?: boolean
+  anomalyReason?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   createdAt?: boolean
@@ -1492,13 +1648,16 @@ export type TransactionSelectScalar = {
   isAiCategorized?: boolean
   aiCategoryRaw?: boolean
   aiConfidenceScore?: boolean
+  isAnomaly?: boolean
+  anomalyScore?: boolean
+  anomalyReason?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "categoryId" | "paymentMethodId" | "recurringTransactionId" | "amount" | "type" | "description" | "date" | "notes" | "isAiCategorized" | "aiCategoryRaw" | "aiConfidenceScore" | "isDeleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transaction"]>
+export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "categoryId" | "paymentMethodId" | "recurringTransactionId" | "amount" | "type" | "description" | "date" | "notes" | "isAiCategorized" | "aiCategoryRaw" | "aiConfidenceScore" | "isAnomaly" | "anomalyScore" | "anomalyReason" | "isDeleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transaction"]>
 export type TransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Transaction$categoryArgs<ExtArgs>
@@ -1540,6 +1699,9 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
     isAiCategorized: boolean
     aiCategoryRaw: string | null
     aiConfidenceScore: number | null
+    isAnomaly: boolean
+    anomalyScore: number | null
+    anomalyReason: string | null
     isDeleted: boolean
     deletedAt: Date | null
     createdAt: Date
@@ -1984,6 +2146,9 @@ export interface TransactionFieldRefs {
   readonly isAiCategorized: Prisma.FieldRef<"Transaction", 'Boolean'>
   readonly aiCategoryRaw: Prisma.FieldRef<"Transaction", 'String'>
   readonly aiConfidenceScore: Prisma.FieldRef<"Transaction", 'Float'>
+  readonly isAnomaly: Prisma.FieldRef<"Transaction", 'Boolean'>
+  readonly anomalyScore: Prisma.FieldRef<"Transaction", 'Float'>
+  readonly anomalyReason: Prisma.FieldRef<"Transaction", 'String'>
   readonly isDeleted: Prisma.FieldRef<"Transaction", 'Boolean'>
   readonly deletedAt: Prisma.FieldRef<"Transaction", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Transaction", 'DateTime'>
