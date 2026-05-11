@@ -4,12 +4,8 @@ import Link from "next/link";
 import { getUserTransactions } from "@/services/transaction.service";
 import { prisma } from "@/prisma";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faDownload, faFilter } from "@fortawesome/free-solid-svg-icons";
 import TransactionTable from "./TransactionTable";
+import TransactionsCsvActions from "./TransactionsCsvActions";
 
 function formatCurrency(amount: number, currency = "NPR") {
   return new Intl.NumberFormat("en-US", {
@@ -77,23 +73,9 @@ export default async function TransactionsPage({
           <h1 className="text-xl font-bold">Transactions</h1>
           <p className="text-sm text-muted-foreground">{total} total records</p>
         </div>
-        <div className="flex items-center gap-2">
-          <a
-            href={`/api/export/csv?${new URLSearchParams(params as Record<string, string>).toString()}`}
-            download
-          >
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <FontAwesomeIcon icon={faDownload} className="h-3.5 w-3.5" />
-              Export CSV
-            </Button>
-          </a>
-          <Link href="/dashboard/transactions?add=1">
-            <Button size="sm" className="gap-1.5">
-              <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
-              Add Transaction
-            </Button>
-          </Link>
-        </div>
+        <TransactionsCsvActions
+          filters={params as Record<string, string | undefined>}
+        />
       </div>
 
       {/* Table */}
