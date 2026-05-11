@@ -16,6 +16,7 @@ const TransactionSchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]),
   date: z.string(),
   categoryId: z.string().optional(),
+  customCategory: z.string().optional(),
   paymentMethodId: z.string().optional(),
   notes: z.string().max(300).optional(),
   isAiCategorized: z.coerce.boolean().optional(),
@@ -23,21 +24,26 @@ const TransactionSchema = z.object({
   aiConfidenceScore: z.coerce.number().min(0).max(1).optional(),
 });
 
-export type TransactionActionState = {
-  errors?: Record<string, string[]>;
-  message?: string;
-  success?: boolean;
-} | undefined;
+export type TransactionActionState =
+  | {
+      errors?: Record<string, string[]>;
+      message?: string;
+      success?: boolean;
+    }
+  | undefined;
 
 async function getAuthSession() {
   const session = await auth();
   if (!session?.user?.id) redirect("/signin");
-  return { ...session, user: { ...session.user, id: session.user.id as string } };
+  return {
+    ...session,
+    user: { ...session.user, id: session.user.id as string },
+  };
 }
 
 export async function createTransaction(
   state: TransactionActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<TransactionActionState> {
   const session = await getAuthSession();
 
@@ -47,6 +53,7 @@ export async function createTransaction(
     type: formData.get("type"),
     date: formData.get("date"),
     categoryId: formData.get("categoryId") || undefined,
+    customCategory: formData.get("customCategory") || undefined,
     paymentMethodId: formData.get("paymentMethodId") || undefined,
     notes: formData.get("notes") || undefined,
     isAiCategorized: formData.get("isAiCategorized") || undefined,
@@ -59,7 +66,46 @@ export async function createTransaction(
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  const { description, amount, type, date, categoryId, paymentMethodId, notes, isAiCategorized, aiCategoryRaw, aiConfidenceScore } = validated.data;
+  const {
+    description,
+    amount,
+    type,
+    date,
+    categoryId,
+    customCategory,
+    paymentMethodId,
+    notes,
+    isAiCategorized,
+    aiCategoryRaw,
+    aiConfidenceScore,
+  } = validated.data;
+
+  let finalCategoryId = categoryId;
+
+  // Handle custom category
+  if (customCategory) {
+    // Check if category already exists
+    const existingCategory = await prisma.category.findFirst({
+      where: {
+        name: customCategory,
+        userId: session.user.id!,
+      },
+    });
+
+    if (existingCategory) {
+      finalCategoryId = existingCategory.id;
+    } else {
+      // Create new category
+      const newCategory = await prisma.category.create({
+        data: {
+          name: customCategory,
+          userId: session.user.id!,
+          type: type as TransactionType,
+        },
+      });
+      finalCategoryId = newCategory.id;
+    }
+  }
 
   const transaction = await transactionService.createTransaction({
     userId: session.user.id!,
@@ -67,7 +113,7 @@ export async function createTransaction(
     amount,
     type: type as TransactionType,
     date: new Date(date),
-    categoryId,
+    categoryId: finalCategoryId,
     paymentMethodId,
     notes,
     isAiCategorized,
@@ -76,19 +122,21 @@ export async function createTransaction(
   });
 
   // Check budget limits if it's an expense with a category
-  if (type === "EXPENSE" && categoryId && transaction) {
+  if (type === "EXPENSE" && finalCategoryId && transaction) {
     const budgets = await budgetService.getUserBudgets(session.user.id!);
-    const matchingBudget = budgets.find((b) => b.categoryId === categoryId);
+    const matchingBudget = budgets.find(
+      (b) => b.categoryId === finalCategoryId,
+    );
     if (matchingBudget) {
       const profile = await prisma.userProfile.findUnique({
         where: { userId: session.user.id! },
       });
       await notificationService.checkBudgetLimits(
         session.user.id!,
-        categoryId,
+        finalCategoryId,
         matchingBudget.spent,
         Number(matchingBudget.amountLimit),
-        profile?.notifyBudgetWarningPct ?? 80
+        profile?.notifyBudgetWarningPct ?? 80,
       );
     }
   }
@@ -101,7 +149,7 @@ export async function createTransaction(
 export async function updateTransaction(
   id: string,
   state: TransactionActionState,
-  formData: FormData
+  formData: FormData,
 ): Promise<TransactionActionState> {
   const session = await getAuthSession();
 
