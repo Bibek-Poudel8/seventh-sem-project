@@ -119,6 +119,20 @@ export function AppSidebar({ user }: AppSidebarProps) {
     .toUpperCase()
     .slice(0, 2);
 
+  const isNavItemActive = (href: string, exact?: boolean) => {
+    const normalizedPathname = pathname.replace(/\/$/, "") || "/";
+    const normalizedHref = href.replace(/\/$/, "") || "/";
+
+    if (exact) {
+      return normalizedPathname === normalizedHref;
+    }
+
+    return (
+      normalizedPathname === normalizedHref ||
+      normalizedPathname.startsWith(`${normalizedHref}/`)
+    );
+  };
+
   return (
     <Sidebar collapsible="icon">
       {/* ── Header / Logo ── */}
@@ -154,13 +168,12 @@ export function AppSidebar({ user }: AppSidebarProps) {
             <SidebarGroupContent>
               <SidebarMenu className="gap-2">
                 {section.items.map((item) => {
-                  const isActive = item.exact
-                    ? pathname === item.href
-                    : pathname.startsWith(item.href);
+                  const isActive = isNavItemActive(item.href, item.exact);
                   return (
                     <SidebarMenuItem key={item.href} className="">
                       <SidebarMenuButton
                         asChild
+                        className="bg-transparent data-[state=open]:bg-accent! hover:bg-accent"
                         isActive={isActive}
                         tooltip={item.title}
                       >

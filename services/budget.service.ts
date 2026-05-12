@@ -1,6 +1,30 @@
 import { prisma } from "@/prisma";
 import { BudgetPeriod } from "@/generated/prisma/client";
 
+async function hydrateBudgetsWithSpend(
+  budgets: Awaited<ReturnType<typeof prisma.budget.findMany>>,
+  userId: string,
+) {
+  return Promise.all(
+    budgets.map(async (budget) => {
+      const spent = await getBudgetSpend(
+        budget.id,
+        userId,
+        budget.startDate,
+        budget.endDate,
+      );
+      const limit = Number(budget.amountLimit);
+
+      return {
+        ...budget,
+        spent,
+        remaining: limit - spent,
+        percentUsed: limit > 0 ? Math.round((spent / limit) * 100) : 0,
+      };
+    }),
+  );
+}
+
 export async function getUserBudgets(userId: string) {
   const budgets = await prisma.budget.findMany({
     where: { userId, isActive: true },
@@ -8,28 +32,24 @@ export async function getUserBudgets(userId: string) {
     orderBy: { createdAt: "desc" },
   });
 
-  // For each budget, calculate how much has been spent in this period
-  const budgetsWithSpend = await Promise.all(
-    budgets.map(async (budget) => {
-      const spent = await getBudgetSpend(budget.id, userId, budget.startDate, budget.endDate);
-      const limit = Number(budget.amountLimit);
-      return {
-        ...budget,
-        spent,
-        remaining: limit - spent,
-        percentUsed: limit > 0 ? Math.round((spent / limit) * 100) : 0,
-      };
-    })
-  );
+  return hydrateBudgetsWithSpend(budgets, userId);
+}
 
-  return budgetsWithSpend;
+export async function getAllUserBudgetsWithSpend(userId: string) {
+  const budgets = await prisma.budget.findMany({
+    where: { userId },
+    include: { category: true },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return hydrateBudgetsWithSpend(budgets, userId);
 }
 
 export async function getBudgetSpend(
   budgetId: string,
   userId: string,
   startDate: Date,
-  endDate: Date | null
+  endDate: Date | null,
 ) {
   const budget = await prisma.budget.findUnique({
     where: { id: budgetId },
@@ -88,7 +108,7 @@ export async function updateBudget(
     startDate: Date;
     endDate: Date | null;
     isActive: boolean;
-  }>
+  }>,
 ) {
   return prisma.budget.update({
     where: { id, userId },
