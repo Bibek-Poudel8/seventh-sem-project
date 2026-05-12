@@ -1,5 +1,17 @@
 import { prisma } from "@/prisma";
-import { NotificationType } from "@/generated/prisma/client";
+import { NotificationType, Prisma } from "@/generated/prisma/client";
+import { emitUserNotification } from "@/lib/socket-bus";
+
+export async function createNotification(
+  data: Prisma.NotificationUncheckedCreateInput
+) {
+  const notification = await prisma.notification.create({ data });
+  const unreadCount = await getUnreadCount(data.userId);
+
+  emitUserNotification(data.userId, notification, unreadCount);
+
+  return notification;
+}
 
 export async function checkBudgetLimits(
   userId: string,
@@ -11,26 +23,22 @@ export async function checkBudgetLimits(
   const pct = budgetLimit > 0 ? (spendTotal / budgetLimit) * 100 : 0;
 
   if (pct >= 100) {
-    await prisma.notification.create({
-      data: {
-        userId,
-        type: NotificationType.BUDGET_EXCEEDED,
-        title: "Budget Exceeded",
-        message: `You have exceeded your budget. Spent ${formatAmount(spendTotal)} of ${formatAmount(budgetLimit)}.`,
-        relatedEntityId: categoryId,
-        relatedEntityType: "Category",
-      },
+    await createNotification({
+      userId,
+      type: NotificationType.BUDGET_EXCEEDED,
+      title: "Budget Exceeded",
+      message: `You have exceeded your budget. Spent ${formatAmount(spendTotal)} of ${formatAmount(budgetLimit)}.`,
+      relatedEntityId: categoryId,
+      relatedEntityType: "Category",
     });
   } else if (pct >= notifyAt) {
-    await prisma.notification.create({
-      data: {
-        userId,
-        type: NotificationType.BUDGET_WARNING,
-        title: "Budget Warning",
-        message: `You have used ${Math.round(pct)}% of your budget (${formatAmount(spendTotal)} of ${formatAmount(budgetLimit)}).`,
-        relatedEntityId: categoryId,
-        relatedEntityType: "Category",
-      },
+    await createNotification({
+      userId,
+      type: NotificationType.BUDGET_WARNING,
+      title: "Budget Warning",
+      message: `You have used ${Math.round(pct)}% of your budget (${formatAmount(spendTotal)} of ${formatAmount(budgetLimit)}).`,
+      relatedEntityId: categoryId,
+      relatedEntityType: "Category",
     });
   }
 }

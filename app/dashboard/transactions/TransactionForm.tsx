@@ -40,12 +40,39 @@ export default function TransactionForm({
   const [aiCategoryRaw, setAiCategoryRaw] = useState("");
   const [aiConfidenceScore, setAiConfidenceScore] = useState("");
   const descriptionRef = useRef<HTMLInputElement>(null);
+  const anomalyCheckTransactionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (state?.success) {
-      onSuccess();
+    if (!state?.success || !state.transactionId) {
+      return;
     }
-  }, [onSuccess, state?.success]);
+
+    if (anomalyCheckTransactionIdRef.current === state.transactionId) {
+      return;
+    }
+
+    anomalyCheckTransactionIdRef.current = state.transactionId;
+
+    const runAnomalyCheck = async () => {
+      try {
+        const response = await fetch("/api/ai/anomaly/check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ transactionId: state.transactionId }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to check transaction anomaly");
+        }
+      } catch (error) {
+        console.error("Anomaly check error:", error);
+      } finally {
+        onSuccess();
+      }
+    };
+
+    void runAnomalyCheck();
+  }, [onSuccess, state?.success, state?.transactionId]);
 
   const findCategoryByName = (name: string) =>
     categories.find((c) => c.name.toLowerCase() === name.toLowerCase());

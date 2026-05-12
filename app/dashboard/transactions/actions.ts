@@ -29,6 +29,7 @@ export type TransactionActionState =
       errors?: Record<string, string[]>;
       message?: string;
       success?: boolean;
+      transactionId?: string;
     }
   | undefined;
 
@@ -143,7 +144,7 @@ export async function createTransaction(
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/transactions");
-  return { success: true };
+  return { success: true, transactionId: transaction.id };
 }
 
 export async function updateTransaction(

@@ -35,7 +35,8 @@ export function CircularProgress({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="hsl(var(--muted))"
+          stroke="#E5E7EB"
+          strokeOpacity="0.9"
           strokeWidth={strokeWidth}
           fill="transparent"
         />
@@ -49,16 +50,21 @@ export function CircularProgress({
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
+          strokeLinejoin="round"
           style={{ transition: "stroke-dashoffset 0.5s ease" }}
         />
       </svg>
       {(centerLabel || centerSubLabel) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           {centerLabel && (
-            <span className="text-sm font-bold leading-tight">{centerLabel}</span>
+            <span className="text-sm font-bold leading-tight">
+              {centerLabel}
+            </span>
           )}
           {centerSubLabel && (
-            <span className="text-[10px] text-muted-foreground">{centerSubLabel}</span>
+            <span className="text-[10px] text-muted-foreground">
+              {centerSubLabel}
+            </span>
           )}
         </div>
       )}

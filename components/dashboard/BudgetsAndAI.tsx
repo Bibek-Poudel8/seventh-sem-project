@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/components/dashboard/utils";
+import AIAnomalyInsights from "@/components/dashboard/AIAnomalyInsights";
 
 export default function BudgetsAndAI({
   activeBudgets,
@@ -112,20 +113,7 @@ export default function BudgetsAndAI({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 gap-3 text-center">
-            <div className="h-10 w-10 rounded-full bg-indigo-500/15 flex items-center justify-center">
-              <FontAwesomeIcon
-                icon={faWandMagicSparkles}
-                className="h-5 w-5 text-indigo-400"
-              />
-            </div>
-            <div>
-              <p className="text-sm font-medium">AI insights unavailable</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                The prediction engine is not yet connected.
-              </p>
-            </div>
-          </div>
+          <AIAnomalyInsights />
         </CardContent>
       </Card>
     </div>
