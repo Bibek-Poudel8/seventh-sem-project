@@ -64,6 +64,7 @@ export default async function TransactionsPage({
   const page = params.page ? Number(params.page) : 1;
   const pageSize = 20;
   const totalPages = Math.ceil(total / pageSize);
+  console.log(categories);
 
   return (
     <div className="space-y-5">
