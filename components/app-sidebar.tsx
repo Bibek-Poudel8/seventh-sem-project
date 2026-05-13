@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect } from "react";
 
 // ─── Nav config ────────────────────────────────────────────────────────────────
 
@@ -118,6 +119,18 @@ export function AppSidebar({ user }: AppSidebarProps) {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  const tempFetchPredictData = async () => {
+    try {
+      const res = await fetch("/api/ai/predict");
+      const data = await res.json();
+      console.log("Prediction data on load:", data);
+    } catch (error) {
+      console.error("Failed to fetch prediction data on load:", error);
+    }
+  };
+  useEffect(() => {
+    tempFetchPredictData();
+  }, []);
 
   const isNavItemActive = (href: string, exact?: boolean) => {
     const normalizedPathname = pathname.replace(/\/$/, "") || "/";
