@@ -234,6 +234,7 @@ model PaymentMethod {
 
 model Transaction {
   id                     String  @id @default(cuid())
+  code                   String  @unique // e.g. TXN-03A3B
   userId                 String
   categoryId             String?
   paymentMethodId        String?
@@ -357,6 +358,8 @@ model Notification {
   // to the specific budget or transaction that triggered them.
   relatedEntityId   String? // e.g., budgetId, transactionId
   relatedEntityType String? // e.g., "Budget", "Transaction"
+  transactionId     String? // Direct reference for transactions
+  transactionCode   String? // Display code for transactions
   createdAt         DateTime         @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

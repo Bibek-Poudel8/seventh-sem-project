@@ -39,6 +39,9 @@ export default function TransactionRow({
           onChange={() => onToggleSelect(tx.id)}
         />
       </td>
+      <td className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+        {tx.code}
+      </td>
       <td className="px-3 py-2.5 text-muted-foreground text-xs whitespace-nowrap">
         {new Date(tx.date).toLocaleDateString("en-US", {
           month: "short",

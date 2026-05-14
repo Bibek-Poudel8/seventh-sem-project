@@ -64,6 +64,15 @@ function randomDateInMonth(year: number, monthIndex: number) {
   return new Date(Date.UTC(year, monthIndex, day, hour, minute, 0))
 }
 
+function generateTransactionCode() {
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  let result = 'TXN-'
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return result
+}
+
 async function main() {
   console.log('Seeding transactions using existing categories (will not create categories)')
 
@@ -131,6 +140,7 @@ async function main() {
       const incomeDate = new Date(Date.UTC(m.year, m.monthIndex, randInt(24, 28), 9, 0, 0))
       await prisma.transaction.create({
         data: {
+          code: generateTransactionCode(),
           userId: user.id,
           categoryId: incomeCategory.id,
           paymentMethodId: paymentMethod.id,
@@ -147,6 +157,7 @@ async function main() {
     if (catsById['sys_utilities_bills']) {
       await prisma.transaction.create({
         data: {
+          code: generateTransactionCode(),
           userId: user.id,
           categoryId: catsById['sys_utilities_bills'].id,
           paymentMethodId: paymentMethod.id,
@@ -183,6 +194,7 @@ async function main() {
 
       await prisma.transaction.create({
         data: {
+          code: generateTransactionCode(),
           userId: user.id,
           categoryId: category.id,
           paymentMethodId: paymentMethod.id,
