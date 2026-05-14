@@ -76,6 +76,15 @@ export async function getUserTransactions(
   return { transactions, total, page, pageSize };
 }
 
+function generateTransactionCode() {
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "TXN-";
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export async function createTransaction(data: {
   userId: string;
   description: string;
@@ -92,6 +101,7 @@ export async function createTransaction(data: {
   const transaction = await prisma.transaction.create({
     data: {
       ...data,
+      code: generateTransactionCode(),
       amount: data.amount,
     },
     include: { category: true },
