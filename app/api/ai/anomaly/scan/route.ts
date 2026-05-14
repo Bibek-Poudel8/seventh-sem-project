@@ -19,9 +19,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const userId = session.user.id;
+
   const transactions = await prisma.transaction.findMany({
     where: {
-      userId: session.user.id,
+      userId: userId,
       type: "EXPENSE",
       isDeleted: false,
       isAnomaly: false,
@@ -55,8 +57,9 @@ export async function GET(req: NextRequest) {
   // Update anomaly fields in database for flagged transactions
   const anomalous = results.filter((r) => r.is_anomaly);
 
-  await Promise.all(
-    anomalous.map((r) =>
+  // Batch all updates into a single transaction to avoid connection overhead
+  if (anomalous.length > 0) {
+    const actions = anomalous.flatMap((r) => [
       prisma.transaction.update({
         where: { id: r.id },
         data: {
@@ -65,18 +68,33 @@ export async function GET(req: NextRequest) {
           anomalyReason: r.anomaly_reason,
         },
       }),
-    ),
-  );
+      prisma.anomaly.upsert({
+        where: { transactionId: r.id },
+        update: {
+          score: r.anomaly_score,
+          reason: r.anomaly_reason,
+        },
+        create: {
+          userId: userId,
+          transactionId: r.id,
+          score: r.anomaly_score,
+          reason: r.anomaly_reason,
+        },
+      }),
+    ]);
+
+    await prisma.$transaction(actions);
+  }
   if (anomalous.length > 0) {
-    await createNotification({
-      userId: session.user.id,
-      type: NotificationType.SYSTEM,
-      title: "Unusual Transaction Detected",
-      message:
-        "We have detected some unusual transactions in your recent activity. Please review them to ensure they are accurate.",
-      // relatedEntityId:   transactionId,
-      relatedEntityType: "Transaction",
-    });
+    // await createNotification({
+    //   userId: userId,
+    //   type: NotificationType.SYSTEM,
+    //   title: "Unusual Transaction Detected",
+    //   message:
+    //     "We have detected some unusual transactions in your recent activity. Please review them to ensure they are accurate.",
+    //   // relatedEntityId:   transactionId,
+    //   relatedEntityType: "Transaction",
+    // });
   }
 
   return NextResponse.json(results);
