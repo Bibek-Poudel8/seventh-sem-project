@@ -82,6 +82,11 @@ export type PaymentMethod = Prisma.PaymentMethodModel
  */
 export type Transaction = Prisma.TransactionModel
 /**
+ * Model Anomaly
+ * 
+ */
+export type Anomaly = Prisma.AnomalyModel
+/**
  * Model Budget
  * 
  */

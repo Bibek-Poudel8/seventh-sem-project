@@ -147,6 +147,7 @@ model User {
   notifications         Notification[]
   recurringTransactions RecurringTransaction[]
   exportLogs            ExportLog[]
+  anomalies             Anomaly[]
 
   @@map("users")
 }
@@ -268,6 +269,7 @@ model Transaction {
   category             Category?             @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   paymentMethod        PaymentMethod?        @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
   recurringTransaction RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+  anomaly              Anomaly?
 
   // Indexes for common query patterns
   @@index([userId])
@@ -277,6 +279,27 @@ model Transaction {
   @@index([userId, paymentMethodId])
   @@index([date])
   @@map("transactions")
+}
+
+// =============================================================================
+// ANOMALIES
+// Tracks AI-detected unusual transactions.
+// =============================================================================
+
+model Anomaly {
+  id            String   @id @default(cuid())
+  userId        String
+  transactionId String?  @unique
+  score         Float
+  reason        String   @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("anomalies")
 }
 
 // =============================================================================

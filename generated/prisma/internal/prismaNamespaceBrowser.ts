@@ -59,6 +59,7 @@ export const ModelName = {
   Category: 'Category',
   PaymentMethod: 'PaymentMethod',
   Transaction: 'Transaction',
+  Anomaly: 'Anomaly',
   Budget: 'Budget',
   RecurringTransaction: 'RecurringTransaction',
   Notification: 'Notification',
@@ -207,6 +208,19 @@ export const TransactionScalarFieldEnum = {
 } as const
 
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const AnomalyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  transactionId: 'transactionId',
+  score: 'score',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AnomalyScalarFieldEnum = (typeof AnomalyScalarFieldEnum)[keyof typeof AnomalyScalarFieldEnum]
 
 
 export const BudgetScalarFieldEnum = {
