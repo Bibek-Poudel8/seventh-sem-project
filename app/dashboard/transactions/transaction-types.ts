@@ -8,6 +8,7 @@ export interface TransactionCategory {
 
 export interface TransactionItem {
   id: string;
+  code: string;
   description: string | null;
   amount: number;
   type: "INCOME" | "EXPENSE";

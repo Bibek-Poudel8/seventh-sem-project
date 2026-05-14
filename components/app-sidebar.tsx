@@ -58,52 +58,54 @@ const NAV_SECTIONS: {
     exact?: boolean;
   }[];
 }[] = [
-  {
-    label: "PRIMARY",
-    items: [
-      { title: "Dashboard", href: "/dashboard", icon: faGauge, exact: true },
-      {
-        title: "Transactions",
-        href: "/dashboard/transactions",
-        icon: faArrowRightArrowLeft,
-      },
-      { title: "Budgets", href: "/dashboard/budgets", icon: faWallet },
-    ],
-  },
-  {
-    label: "INSIGHTS",
-    items: [
-      { title: "Analytics", href: "/dashboard/analytics", icon: faChartBar },
-      {
-        title: "AI Insights",
-        href: "/dashboard/ai-insights",
-        icon: faWandMagicSparkles,
-      },
-    ],
-  },
-  {
-    label: "MANAGEMENT",
-    items: [
-      {
-        title: "Payment Methods",
-        href: "/dashboard/payment-methods",
-        icon: faCreditCard,
-      },
-      {
-        title: "Notifications",
-        href: "/dashboard/notifications",
-        icon: faBell,
-      },
-    ],
-  },
-  {
-    label: "SYSTEM",
-    items: [
-      { title: "Data Export", href: "/dashboard/export", icon: faDownload },
-      { title: "Settings", href: "/dashboard/settings", icon: faGear },
-    ],
-  },
-];
+    {
+      label: "PRIMARY",
+      items: [
+        { title: "Dashboard", href: "/dashboard", icon: faGauge, exact: true },
+        {
+          title: "Transactions",
+          href: "/dashboard/transactions",
+          icon: faArrowRightArrowLeft,
+        },
+        { title: "Budgets", href: "/dashboard/budgets", icon: faWallet },
+      ],
+    },
+    {
+      label: "INSIGHTS",
+      items: [
+        // { title: "Analytics", href: "/dashboard/analytics", icon: faChartBar },
+        {
+          title: "AI Insights",
+          href: "/dashboard/ai-insights",
+          icon: faWandMagicSparkles,
+        },
+      ],
+    },
+    {
+      label: "MANAGEMENT",
+      items: [
+        // {
+        //   title: "Payment Methods",
+        //   href: "/dashboard/payment-methods",
+        //   icon: faCreditCard,
+        // },
+        {
+          title: "Notifications",
+          href: "/dashboard/notifications",
+          icon: faBell,
+        },
+        { title: "Data Export", href: "/dashboard/export", icon: faDownload },
+        { title: "Settings", href: "/dashboard/settings", icon: faGear },
+      ],
+    },
+    // {
+    //   label: "SYSTEM",
+    //   items: [
+    //     { title: "Data Export", href: "/dashboard/export", icon: faDownload },
+    //     { title: "Settings", href: "/dashboard/settings", icon: faGear },
+    //   ],
+    // },
+  ];
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 

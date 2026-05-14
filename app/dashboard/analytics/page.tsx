@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { getMonthlyTrend, getCategoryBreakdown, getMonthlySummary } from "@/services/analytics.service";
+import { getMonthlyTrend, getCategoryBreakdown, getPeriodSummary } from "@/services/analytics.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarLineChart } from "@/components/charts/BarLineChart";
 import { DonutChart } from "@/components/charts/DonutChart";
@@ -12,10 +12,13 @@ export default async function AnalyticsPage() {
 
   const userId = session.user.id;
   const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
   const [trend, breakdown, summary, profile] = await Promise.all([
     getMonthlyTrend(userId, 12),
-    getCategoryBreakdown(userId, now),
-    getMonthlySummary(userId, now),
+    getCategoryBreakdown(userId, startOfMonth, endOfMonth),
+    getPeriodSummary(userId, startOfMonth, endOfMonth),
     prisma.userProfile.findUnique({ where: { userId } }),
   ]);
 

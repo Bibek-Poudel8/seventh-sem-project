@@ -15,10 +15,12 @@ export default function SummaryCards({
   summary,
   currency,
   monthlyTrend = [],
+  periodLabel = "last month",
 }: {
   summary: any;
   currency: string;
   monthlyTrend?: TrendItem[];
+  periodLabel?: string;
 }) {
   const incomeSeries = (monthlyTrend ?? []).map((m) => m.income);
   const expenseSeries = (monthlyTrend ?? []).map((m) => m.expenses);
@@ -52,7 +54,7 @@ export default function SummaryCards({
             </div>
             <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-2">
               <DeltaBadge delta={netDelta} />
-              <span>last month</span>
+              <span>vs prev. {periodLabel}</span>
             </div>
           </div>
           <div className="w-28 h-12">
@@ -76,7 +78,7 @@ export default function SummaryCards({
             </div>
             <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-2">
               <DeltaBadge delta={summary.incomeDelta} />
-              <span>last month</span>
+              <span>vs prev. {periodLabel}</span>
             </div>
           </div>
           <div className="w-28 h-12">
@@ -97,7 +99,7 @@ export default function SummaryCards({
             </div>
             <div className="text-[10px] text-muted-foreground mt-1 flex items-center gap-2">
               <DeltaBadge delta={summary.expenseDelta} />
-              <span>last month</span>
+              <span>vs prev. {periodLabel}</span>
             </div>
           </div>
           <div className="w-28 h-12">

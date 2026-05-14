@@ -184,6 +184,7 @@ export type PaymentMethodScalarFieldEnum = (typeof PaymentMethodScalarFieldEnum)
 
 export const TransactionScalarFieldEnum = {
   id: 'id',
+  code: 'code',
   userId: 'userId',
   categoryId: 'categoryId',
   paymentMethodId: 'paymentMethodId',
@@ -254,6 +255,8 @@ export const NotificationScalarFieldEnum = {
   isRead: 'isRead',
   relatedEntityId: 'relatedEntityId',
   relatedEntityType: 'relatedEntityType',
+  transactionId: 'transactionId',
+  transactionCode: 'transactionCode',
   createdAt: 'createdAt'
 } as const
 

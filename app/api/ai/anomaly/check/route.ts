@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       userId: session.user.id,
       type: "EXPENSE",
       isDeleted: false,
+      isAnomaly: false,
       id: { not: transactionId },
     },
     include: { category: true },

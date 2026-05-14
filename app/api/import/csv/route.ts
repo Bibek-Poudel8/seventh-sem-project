@@ -95,6 +95,15 @@ function parseCsv(content: string): CsvRow[] {
   });
 }
 
+function generateTransactionCode() {
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "TXN-";
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -157,6 +166,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.transaction.create({
       data: {
+        code: generateTransactionCode(),
         userId: session.user.id,
         description,
         amount: row.amount,

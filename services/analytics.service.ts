@@ -1,11 +1,10 @@
 import { prisma } from "@/prisma";
 
-export async function getMonthlySummary(userId: string, month: Date) {
-  const start = new Date(month.getFullYear(), month.getMonth(), 1);
-  const end = new Date(month.getFullYear(), month.getMonth() + 1, 0, 23, 59, 59);
-
-  const prevStart = new Date(month.getFullYear(), month.getMonth() - 1, 1);
-  const prevEnd = new Date(month.getFullYear(), month.getMonth(), 0, 23, 59, 59);
+export async function getPeriodSummary(userId: string, start: Date, end: Date) {
+  // Calculate duration to determine previous period for comparison
+  const duration = end.getTime() - start.getTime();
+  const prevEnd = new Date(start.getTime() - 1);
+  const prevStart = new Date(prevEnd.getTime() - duration);
 
   const [incomeResult, expenseResult, prevIncomeResult, prevExpenseResult] =
     await Promise.all([
@@ -51,10 +50,7 @@ export async function getMonthlySummary(userId: string, month: Date) {
   };
 }
 
-export async function getCategoryBreakdown(userId: string, month: Date) {
-  const start = new Date(month.getFullYear(), month.getMonth(), 1);
-  const end = new Date(month.getFullYear(), month.getMonth() + 1, 0, 23, 59, 59);
-
+export async function getCategoryBreakdown(userId: string, start: Date, end: Date) {
   const transactions = await prisma.transaction.findMany({
     where: {
       userId,
@@ -118,9 +114,13 @@ export async function getMonthlyTrend(userId: string, months = 6) {
   return results;
 }
 
-export async function getRecentTransactions(userId: string, limit = 5) {
+export async function getRecentTransactions(userId: string, limit = 5, start?: Date, end?: Date) {
   return prisma.transaction.findMany({
-    where: { userId, isDeleted: false },
+    where: { 
+      userId, 
+      isDeleted: false,
+      ...(start && end ? { date: { gte: start, lte: end } } : {})
+    },
     include: { category: true },
     orderBy: { date: "desc" },
     take: limit,

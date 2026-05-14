@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
       userId: session.user.id,
       type: "EXPENSE",
       isDeleted: false,
+      isAnomaly: false,
     },
     include: { category: true },
     orderBy: { date: "desc" },

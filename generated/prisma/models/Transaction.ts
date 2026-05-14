@@ -40,6 +40,7 @@ export type TransactionSumAggregateOutputType = {
 
 export type TransactionMinAggregateOutputType = {
   id: string | null
+  code: string | null
   userId: string | null
   categoryId: string | null
   paymentMethodId: string | null
@@ -63,6 +64,7 @@ export type TransactionMinAggregateOutputType = {
 
 export type TransactionMaxAggregateOutputType = {
   id: string | null
+  code: string | null
   userId: string | null
   categoryId: string | null
   paymentMethodId: string | null
@@ -86,6 +88,7 @@ export type TransactionMaxAggregateOutputType = {
 
 export type TransactionCountAggregateOutputType = {
   id: number
+  code: number
   userId: number
   categoryId: number
   paymentMethodId: number
@@ -123,6 +126,7 @@ export type TransactionSumAggregateInputType = {
 
 export type TransactionMinAggregateInputType = {
   id?: true
+  code?: true
   userId?: true
   categoryId?: true
   paymentMethodId?: true
@@ -146,6 +150,7 @@ export type TransactionMinAggregateInputType = {
 
 export type TransactionMaxAggregateInputType = {
   id?: true
+  code?: true
   userId?: true
   categoryId?: true
   paymentMethodId?: true
@@ -169,6 +174,7 @@ export type TransactionMaxAggregateInputType = {
 
 export type TransactionCountAggregateInputType = {
   id?: true
+  code?: true
   userId?: true
   categoryId?: true
   paymentMethodId?: true
@@ -279,6 +285,7 @@ export type TransactionGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type TransactionGroupByOutputType = {
   id: string
+  code: string
   userId: string
   categoryId: string | null
   paymentMethodId: string | null
@@ -325,6 +332,7 @@ export type TransactionWhereInput = {
   OR?: Prisma.TransactionWhereInput[]
   NOT?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
   id?: Prisma.StringFilter<"Transaction"> | string
+  code?: Prisma.StringFilter<"Transaction"> | string
   userId?: Prisma.StringFilter<"Transaction"> | string
   categoryId?: Prisma.StringNullableFilter<"Transaction"> | string | null
   paymentMethodId?: Prisma.StringNullableFilter<"Transaction"> | string | null
@@ -352,6 +360,7 @@ export type TransactionWhereInput = {
 
 export type TransactionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethodId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,6 +388,7 @@ export type TransactionOrderByWithRelationInput = {
 
 export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  code?: string
   AND?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
   OR?: Prisma.TransactionWhereInput[]
   NOT?: Prisma.TransactionWhereInput | Prisma.TransactionWhereInput[]
@@ -405,10 +415,11 @@ export type TransactionWhereUniqueInput = Prisma.AtLeast<{
   category?: Prisma.XOR<Prisma.CategoryNullableScalarRelationFilter, Prisma.CategoryWhereInput> | null
   paymentMethod?: Prisma.XOR<Prisma.PaymentMethodNullableScalarRelationFilter, Prisma.PaymentMethodWhereInput> | null
   recurringTransaction?: Prisma.XOR<Prisma.RecurringTransactionNullableScalarRelationFilter, Prisma.RecurringTransactionWhereInput> | null
-}, "id">
+}, "id" | "code">
 
 export type TransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentMethodId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -440,6 +451,7 @@ export type TransactionScalarWhereWithAggregatesInput = {
   OR?: Prisma.TransactionScalarWhereWithAggregatesInput[]
   NOT?: Prisma.TransactionScalarWhereWithAggregatesInput | Prisma.TransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Transaction"> | string
+  code?: Prisma.StringWithAggregatesFilter<"Transaction"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Transaction"> | string
   categoryId?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
   paymentMethodId?: Prisma.StringNullableWithAggregatesFilter<"Transaction"> | string | null
@@ -463,6 +475,7 @@ export type TransactionScalarWhereWithAggregatesInput = {
 
 export type TransactionCreateInput = {
   id?: string
+  code: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: $Enums.TransactionType
   description?: string | null
@@ -486,6 +499,7 @@ export type TransactionCreateInput = {
 
 export type TransactionUncheckedCreateInput = {
   id?: string
+  code: string
   userId: string
   categoryId?: string | null
   paymentMethodId?: string | null
@@ -509,6 +523,7 @@ export type TransactionUncheckedCreateInput = {
 
 export type TransactionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -532,6 +547,7 @@ export type TransactionUpdateInput = {
 
 export type TransactionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -555,6 +571,7 @@ export type TransactionUncheckedUpdateInput = {
 
 export type TransactionCreateManyInput = {
   id?: string
+  code: string
   userId: string
   categoryId?: string | null
   paymentMethodId?: string | null
@@ -578,6 +595,7 @@ export type TransactionCreateManyInput = {
 
 export type TransactionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -597,6 +615,7 @@ export type TransactionUpdateManyMutationInput = {
 
 export type TransactionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -630,6 +649,7 @@ export type TransactionOrderByRelationAggregateInput = {
 
 export type TransactionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   paymentMethodId?: Prisma.SortOrder
@@ -659,6 +679,7 @@ export type TransactionAvgOrderByAggregateInput = {
 
 export type TransactionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   paymentMethodId?: Prisma.SortOrder
@@ -682,6 +703,7 @@ export type TransactionMaxOrderByAggregateInput = {
 
 export type TransactionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  code?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   categoryId?: Prisma.SortOrder
   paymentMethodId?: Prisma.SortOrder
@@ -895,6 +917,7 @@ export type TransactionUncheckedUpdateManyWithoutRecurringTransactionNestedInput
 
 export type TransactionCreateWithoutUserInput = {
   id?: string
+  code: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: $Enums.TransactionType
   description?: string | null
@@ -917,6 +940,7 @@ export type TransactionCreateWithoutUserInput = {
 
 export type TransactionUncheckedCreateWithoutUserInput = {
   id?: string
+  code: string
   categoryId?: string | null
   paymentMethodId?: string | null
   recurringTransactionId?: string | null
@@ -968,6 +992,7 @@ export type TransactionScalarWhereInput = {
   OR?: Prisma.TransactionScalarWhereInput[]
   NOT?: Prisma.TransactionScalarWhereInput | Prisma.TransactionScalarWhereInput[]
   id?: Prisma.StringFilter<"Transaction"> | string
+  code?: Prisma.StringFilter<"Transaction"> | string
   userId?: Prisma.StringFilter<"Transaction"> | string
   categoryId?: Prisma.StringNullableFilter<"Transaction"> | string | null
   paymentMethodId?: Prisma.StringNullableFilter<"Transaction"> | string | null
@@ -991,6 +1016,7 @@ export type TransactionScalarWhereInput = {
 
 export type TransactionCreateWithoutCategoryInput = {
   id?: string
+  code: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: $Enums.TransactionType
   description?: string | null
@@ -1013,6 +1039,7 @@ export type TransactionCreateWithoutCategoryInput = {
 
 export type TransactionUncheckedCreateWithoutCategoryInput = {
   id?: string
+  code: string
   userId: string
   paymentMethodId?: string | null
   recurringTransactionId?: string | null
@@ -1061,6 +1088,7 @@ export type TransactionUpdateManyWithWhereWithoutCategoryInput = {
 
 export type TransactionCreateWithoutPaymentMethodInput = {
   id?: string
+  code: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: $Enums.TransactionType
   description?: string | null
@@ -1083,6 +1111,7 @@ export type TransactionCreateWithoutPaymentMethodInput = {
 
 export type TransactionUncheckedCreateWithoutPaymentMethodInput = {
   id?: string
+  code: string
   userId: string
   categoryId?: string | null
   recurringTransactionId?: string | null
@@ -1131,6 +1160,7 @@ export type TransactionUpdateManyWithWhereWithoutPaymentMethodInput = {
 
 export type TransactionCreateWithoutRecurringTransactionInput = {
   id?: string
+  code: string
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   type: $Enums.TransactionType
   description?: string | null
@@ -1153,6 +1183,7 @@ export type TransactionCreateWithoutRecurringTransactionInput = {
 
 export type TransactionUncheckedCreateWithoutRecurringTransactionInput = {
   id?: string
+  code: string
   userId: string
   categoryId?: string | null
   paymentMethodId?: string | null
@@ -1201,6 +1232,7 @@ export type TransactionUpdateManyWithWhereWithoutRecurringTransactionInput = {
 
 export type TransactionCreateManyUserInput = {
   id?: string
+  code: string
   categoryId?: string | null
   paymentMethodId?: string | null
   recurringTransactionId?: string | null
@@ -1223,6 +1255,7 @@ export type TransactionCreateManyUserInput = {
 
 export type TransactionUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1245,6 +1278,7 @@ export type TransactionUpdateWithoutUserInput = {
 
 export type TransactionUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurringTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1267,6 +1301,7 @@ export type TransactionUncheckedUpdateWithoutUserInput = {
 
 export type TransactionUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurringTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1289,6 +1324,7 @@ export type TransactionUncheckedUpdateManyWithoutUserInput = {
 
 export type TransactionCreateManyCategoryInput = {
   id?: string
+  code: string
   userId: string
   paymentMethodId?: string | null
   recurringTransactionId?: string | null
@@ -1311,6 +1347,7 @@ export type TransactionCreateManyCategoryInput = {
 
 export type TransactionUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1333,6 +1370,7 @@ export type TransactionUpdateWithoutCategoryInput = {
 
 export type TransactionUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurringTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1355,6 +1393,7 @@ export type TransactionUncheckedUpdateWithoutCategoryInput = {
 
 export type TransactionUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurringTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1377,6 +1416,7 @@ export type TransactionUncheckedUpdateManyWithoutCategoryInput = {
 
 export type TransactionCreateManyPaymentMethodInput = {
   id?: string
+  code: string
   userId: string
   categoryId?: string | null
   recurringTransactionId?: string | null
@@ -1399,6 +1439,7 @@ export type TransactionCreateManyPaymentMethodInput = {
 
 export type TransactionUpdateWithoutPaymentMethodInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1421,6 +1462,7 @@ export type TransactionUpdateWithoutPaymentMethodInput = {
 
 export type TransactionUncheckedUpdateWithoutPaymentMethodInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurringTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1443,6 +1485,7 @@ export type TransactionUncheckedUpdateWithoutPaymentMethodInput = {
 
 export type TransactionUncheckedUpdateManyWithoutPaymentMethodInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   recurringTransactionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1465,6 +1508,7 @@ export type TransactionUncheckedUpdateManyWithoutPaymentMethodInput = {
 
 export type TransactionCreateManyRecurringTransactionInput = {
   id?: string
+  code: string
   userId: string
   categoryId?: string | null
   paymentMethodId?: string | null
@@ -1487,6 +1531,7 @@ export type TransactionCreateManyRecurringTransactionInput = {
 
 export type TransactionUpdateWithoutRecurringTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   type?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1509,6 +1554,7 @@ export type TransactionUpdateWithoutRecurringTransactionInput = {
 
 export type TransactionUncheckedUpdateWithoutRecurringTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1531,6 +1577,7 @@ export type TransactionUncheckedUpdateWithoutRecurringTransactionInput = {
 
 export type TransactionUncheckedUpdateManyWithoutRecurringTransactionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentMethodId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1555,6 +1602,7 @@ export type TransactionUncheckedUpdateManyWithoutRecurringTransactionInput = {
 
 export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  code?: boolean
   userId?: boolean
   categoryId?: boolean
   paymentMethodId?: boolean
@@ -1582,6 +1630,7 @@ export type TransactionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 
 export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  code?: boolean
   userId?: boolean
   categoryId?: boolean
   paymentMethodId?: boolean
@@ -1609,6 +1658,7 @@ export type TransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 
 export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  code?: boolean
   userId?: boolean
   categoryId?: boolean
   paymentMethodId?: boolean
@@ -1636,6 +1686,7 @@ export type TransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 
 export type TransactionSelectScalar = {
   id?: boolean
+  code?: boolean
   userId?: boolean
   categoryId?: boolean
   paymentMethodId?: boolean
@@ -1657,7 +1708,7 @@ export type TransactionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "categoryId" | "paymentMethodId" | "recurringTransactionId" | "amount" | "type" | "description" | "date" | "notes" | "isAiCategorized" | "aiCategoryRaw" | "aiConfidenceScore" | "isAnomaly" | "anomalyScore" | "anomalyReason" | "isDeleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transaction"]>
+export type TransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "userId" | "categoryId" | "paymentMethodId" | "recurringTransactionId" | "amount" | "type" | "description" | "date" | "notes" | "isAiCategorized" | "aiCategoryRaw" | "aiConfidenceScore" | "isAnomaly" | "anomalyScore" | "anomalyReason" | "isDeleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["transaction"]>
 export type TransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.Transaction$categoryArgs<ExtArgs>
@@ -1687,6 +1738,7 @@ export type $TransactionPayload<ExtArgs extends runtime.Types.Extensions.Interna
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    code: string
     userId: string
     categoryId: string | null
     paymentMethodId: string | null
@@ -2134,6 +2186,7 @@ export interface Prisma__TransactionClient<T, Null = never, ExtArgs extends runt
  */
 export interface TransactionFieldRefs {
   readonly id: Prisma.FieldRef<"Transaction", 'String'>
+  readonly code: Prisma.FieldRef<"Transaction", 'String'>
   readonly userId: Prisma.FieldRef<"Transaction", 'String'>
   readonly categoryId: Prisma.FieldRef<"Transaction", 'String'>
   readonly paymentMethodId: Prisma.FieldRef<"Transaction", 'String'>

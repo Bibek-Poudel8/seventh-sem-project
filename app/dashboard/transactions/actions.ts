@@ -108,12 +108,34 @@ export async function createTransaction(
     }
   }
 
+  const now = new Date();
+  // Get today's date in Nepal (GMT+5:45)
+  const nepaliToday = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kathmandu",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+
+  let finalDate: Date;
+
+  if (date === nepaliToday) {
+    // If it's today in Nepal, use the current time
+    finalDate = now;
+  } else {
+    // For other dates, set to 00:00:00 in Nepal timezone
+    // We create a date at 00:00 UTC and then subtract 5:45 (345 mins) to get UTC equivalent
+    const [y, m, d] = date.split("-").map(Number);
+    finalDate = new Date(Date.UTC(y, m - 1, d, 0, 0, 0));
+    finalDate.setMinutes(finalDate.getMinutes() - 345);
+  }
+
   const transaction = await transactionService.createTransaction({
     userId: session.user.id!,
     description,
     amount,
     type: type as TransactionType,
-    date: new Date(date),
+    date: finalDate,
     categoryId: finalCategoryId,
     paymentMethodId,
     notes,
@@ -170,11 +192,30 @@ export async function updateTransaction(
 
   const { description, amount, type, date, categoryId, notes } = validated.data;
 
+  let finalDate = undefined;
+  if (date) {
+    const now = new Date();
+    const nepaliToday = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kathmandu",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(now);
+
+    if (date === nepaliToday) {
+      finalDate = now;
+    } else {
+      const [y, m, d] = date.split("-").map(Number);
+      finalDate = new Date(Date.UTC(y, m - 1, d, 0, 0, 0));
+      finalDate.setMinutes(finalDate.getMinutes() - 345);
+    }
+  }
+
   await transactionService.updateTransaction(id, session.user.id!, {
     description,
     amount,
     type: type as TransactionType | undefined,
-    date: date ? new Date(date) : undefined,
+    date: finalDate,
     categoryId: categoryId ?? null,
     notes,
   });

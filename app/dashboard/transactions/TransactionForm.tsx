@@ -128,7 +128,9 @@ export default function TransactionForm({
     }
   };
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Kathmandu",
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (!categoryId) {

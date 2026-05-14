@@ -85,6 +85,9 @@ export default function TransactionTable({
                   />
                 </th>
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">
+                  Code
+                </th>
+                <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">
                   Date
                 </th>
                 <th className="px-3 py-2.5 text-left font-medium text-muted-foreground">
@@ -105,7 +108,7 @@ export default function TransactionTable({
               {transactions.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-3 py-12 text-center text-muted-foreground"
                   >
                     No transactions found
