@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const userId = session.user.id;
+
   const { transactionId } = await req.json();
 
   if (!transactionId) {
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   const history = await prisma.transaction.findMany({
     where: {
-      userId: session.user.id,
+      userId: userId,
       type: "EXPENSE",
       isDeleted: false,
       isAnomaly: false,
@@ -78,17 +80,32 @@ export async function POST(req: NextRequest) {
   const result: AnomalyResult = await res.json();
 
   if (result.is_anomaly) {
-    await prisma.transaction.update({
-      where: { id: transactionId },
-      data: {
-        isAnomaly: true,
-        anomalyScore: result.anomaly_score,
-        anomalyReason: result.anomaly_reason,
-      },
-    });
+    await prisma.$transaction([
+      prisma.transaction.update({
+        where: { id: transactionId },
+        data: {
+          isAnomaly: true,
+          anomalyScore: result.anomaly_score,
+          anomalyReason: result.anomaly_reason,
+        },
+      }),
+      prisma.anomaly.upsert({
+        where: { transactionId },
+        update: {
+          score: result.anomaly_score,
+          reason: result.anomaly_reason,
+        },
+        create: {
+          userId: userId,
+          transactionId: transactionId,
+          score: result.anomaly_score,
+          reason: result.anomaly_reason,
+        },
+      }),
+    ]);
 
     await createNotification({
-      userId: session.user.id,
+      userId: userId,
       type: NotificationType.SYSTEM,
       title: "Unusual Transaction Detected",
       message: result.anomaly_reason,

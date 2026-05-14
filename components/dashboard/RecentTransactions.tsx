@@ -38,63 +38,72 @@ export default function RecentTransactions({
             </Link>
           </div>
         ) : (
-          <div className="space-y-1">
-            {recentTransactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-muted/50 transition-colors"
-              >
-                <div
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm"
-                  style={{
-                    backgroundColor: `${tx.category?.color ?? "#6B7280"}20`,
-                    color: tx.category?.color ?? "#6B7280",
-                  }}
-                >
-                  {tx.category?.icon ?? "💰"}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">
-                    {tx.description ?? "Unnamed"}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] h-4 px-1.5"
-                    >
-                      {tx.category?.name ?? "Uncategorized"}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                      <FontAwesomeIcon icon={faClock} className="h-2.5 w-2.5" />
-                      {new Date(tx.date).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  <p
-                    className={cn(
-                      "text-sm font-semibold",
-                      tx.type === "INCOME"
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-red-600 dark:text-red-400",
-                    )}
+          <div className="overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left border-b border-muted/50">
+                  <th className="pb-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Transaction</th>
+                  <th className="pb-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Category</th>
+                  <th className="pb-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Date</th>
+                  <th className="pb-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-muted/30">
+                {recentTransactions.map((tx) => (
+                  <tr
+                    key={tx.id}
+                    className="group hover:bg-muted/30 transition-all duration-200"
                   >
-                    {tx.type === "INCOME" ? "+" : "-"}
-                    {formatCurrency(Number(tx.amount), currency)}
-                  </p>
-                  {tx.isAiCategorized &&
-                    tx.aiConfidenceScore !== null &&
-                    tx.aiConfidenceScore! < 0.8 && (
-                      <span className="text-[10px] text-amber-500">
-                        ⚠ AI: {Math.round(tx.aiConfidenceScore! * 100)}%
+                    <td className="py-3.5 pr-4">
+                      <div className="flex items-center gap-3">
+
+                        <p className="text-sm font-medium truncate max-w-[140px] md:max-w-[200px]">
+                          {tx.description ?? "Unnamed"}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="py-3.5">
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] h-5 px-2 bg-primary/5 text-primary border-none font-medium"
+                      >
+                        {tx.category?.name ?? "Uncategorized"}
+                      </Badge>
+                    </td>
+                    <td className="py-3.5 text-right whitespace-nowrap">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(tx.date).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </span>
-                    )}
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td className="py-3.5 text-right whitespace-nowrap">
+                      <div className="flex flex-col items-end">
+                        <span
+                          className={cn(
+                            "text-sm font-bold",
+                            tx.type === "INCOME"
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : "text-foreground"
+                          )}
+                        >
+                          {tx.type === "INCOME" ? "+" : "-"}
+                          {formatCurrency(Number(tx.amount), currency)}
+                        </span>
+                        {tx.isAiCategorized &&
+                          tx.aiConfidenceScore !== null &&
+                          tx.aiConfidenceScore! < 0.8 && (
+                            <span className="text-[9px] text-amber-500 font-medium">
+                              AI: {Math.round(tx.aiConfidenceScore! * 100)}%
+                            </span>
+                          )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </CardContent>

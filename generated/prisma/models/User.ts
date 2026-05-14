@@ -216,6 +216,7 @@ export type UserWhereInput = {
   notifications?: Prisma.NotificationListRelationFilter
   recurringTransactions?: Prisma.RecurringTransactionListRelationFilter
   exportLogs?: Prisma.ExportLogListRelationFilter
+  anomalies?: Prisma.AnomalyListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -237,6 +238,7 @@ export type UserOrderByWithRelationInput = {
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   recurringTransactions?: Prisma.RecurringTransactionOrderByRelationAggregateInput
   exportLogs?: Prisma.ExportLogOrderByRelationAggregateInput
+  anomalies?: Prisma.AnomalyOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -261,6 +263,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   notifications?: Prisma.NotificationListRelationFilter
   recurringTransactions?: Prisma.RecurringTransactionListRelationFilter
   exportLogs?: Prisma.ExportLogListRelationFilter
+  anomalies?: Prisma.AnomalyListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -310,6 +313,7 @@ export type UserCreateInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -331,6 +335,7 @@ export type UserUncheckedCreateInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -352,6 +357,7 @@ export type UserUpdateInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -373,6 +379,7 @@ export type UserUncheckedUpdateInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -541,6 +548,20 @@ export type UserUpdateOneRequiredWithoutTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTransactionsInput, Prisma.UserUpdateWithoutTransactionsInput>, Prisma.UserUncheckedUpdateWithoutTransactionsInput>
 }
 
+export type UserCreateNestedOneWithoutAnomaliesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnomaliesInput, Prisma.UserUncheckedCreateWithoutAnomaliesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnomaliesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAnomaliesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAnomaliesInput, Prisma.UserUncheckedCreateWithoutAnomaliesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAnomaliesInput
+  upsert?: Prisma.UserUpsertWithoutAnomaliesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAnomaliesInput, Prisma.UserUpdateWithoutAnomaliesInput>, Prisma.UserUncheckedUpdateWithoutAnomaliesInput>
+}
+
 export type UserCreateNestedOneWithoutBudgetsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBudgetsInput, Prisma.UserUncheckedCreateWithoutBudgetsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBudgetsInput
@@ -615,6 +636,7 @@ export type UserCreateWithoutAccountsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -635,6 +657,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -671,6 +694,7 @@ export type UserUpdateWithoutAccountsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -691,6 +715,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -711,6 +736,7 @@ export type UserCreateWithoutSessionsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -731,6 +757,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -767,6 +794,7 @@ export type UserUpdateWithoutSessionsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -787,6 +815,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutProfileInput = {
@@ -807,6 +836,7 @@ export type UserCreateWithoutProfileInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutProfileInput = {
@@ -827,6 +857,7 @@ export type UserUncheckedCreateWithoutProfileInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutProfileInput = {
@@ -863,6 +894,7 @@ export type UserUpdateWithoutProfileInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutProfileInput = {
@@ -883,6 +915,7 @@ export type UserUncheckedUpdateWithoutProfileInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCategoriesInput = {
@@ -903,6 +936,7 @@ export type UserCreateWithoutCategoriesInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCategoriesInput = {
@@ -923,6 +957,7 @@ export type UserUncheckedCreateWithoutCategoriesInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCategoriesInput = {
@@ -959,6 +994,7 @@ export type UserUpdateWithoutCategoriesInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCategoriesInput = {
@@ -979,6 +1015,7 @@ export type UserUncheckedUpdateWithoutCategoriesInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPaymentMethodsInput = {
@@ -999,6 +1036,7 @@ export type UserCreateWithoutPaymentMethodsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPaymentMethodsInput = {
@@ -1019,6 +1057,7 @@ export type UserUncheckedCreateWithoutPaymentMethodsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPaymentMethodsInput = {
@@ -1055,6 +1094,7 @@ export type UserUpdateWithoutPaymentMethodsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPaymentMethodsInput = {
@@ -1075,6 +1115,7 @@ export type UserUncheckedUpdateWithoutPaymentMethodsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTransactionsInput = {
@@ -1095,6 +1136,7 @@ export type UserCreateWithoutTransactionsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTransactionsInput = {
@@ -1115,6 +1157,7 @@ export type UserUncheckedCreateWithoutTransactionsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTransactionsInput = {
@@ -1151,6 +1194,7 @@ export type UserUpdateWithoutTransactionsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTransactionsInput = {
@@ -1166,6 +1210,107 @@ export type UserUncheckedUpdateWithoutTransactionsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  paymentMethods?: Prisma.PaymentMethodUncheckedUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
+  exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAnomaliesInput = {
+  id?: string
+  name?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.UserProfileCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  paymentMethods?: Prisma.PaymentMethodCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
+  exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAnomaliesInput = {
+  id?: string
+  name?: string | null
+  email: string
+  emailVerified?: Date | string | null
+  image?: string | null
+  password?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile?: Prisma.UserProfileUncheckedCreateNestedOneWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  paymentMethods?: Prisma.PaymentMethodUncheckedCreateNestedManyWithoutUserInput
+  budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
+  exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAnomaliesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnomaliesInput, Prisma.UserUncheckedCreateWithoutAnomaliesInput>
+}
+
+export type UserUpsertWithoutAnomaliesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAnomaliesInput, Prisma.UserUncheckedUpdateWithoutAnomaliesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAnomaliesInput, Prisma.UserUncheckedCreateWithoutAnomaliesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAnomaliesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAnomaliesInput, Prisma.UserUncheckedUpdateWithoutAnomaliesInput>
+}
+
+export type UserUpdateWithoutAnomaliesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.UserProfileUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  paymentMethods?: Prisma.PaymentMethodUpdateManyWithoutUserNestedInput
+  budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
+  exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAnomaliesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.UserProfileUncheckedUpdateOneWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
   paymentMethods?: Prisma.PaymentMethodUncheckedUpdateManyWithoutUserNestedInput
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -1191,6 +1336,7 @@ export type UserCreateWithoutBudgetsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBudgetsInput = {
@@ -1211,6 +1357,7 @@ export type UserUncheckedCreateWithoutBudgetsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBudgetsInput = {
@@ -1247,6 +1394,7 @@ export type UserUpdateWithoutBudgetsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBudgetsInput = {
@@ -1267,6 +1415,7 @@ export type UserUncheckedUpdateWithoutBudgetsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecurringTransactionsInput = {
@@ -1287,6 +1436,7 @@ export type UserCreateWithoutRecurringTransactionsInput = {
   budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecurringTransactionsInput = {
@@ -1307,6 +1457,7 @@ export type UserUncheckedCreateWithoutRecurringTransactionsInput = {
   budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecurringTransactionsInput = {
@@ -1343,6 +1494,7 @@ export type UserUpdateWithoutRecurringTransactionsInput = {
   budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecurringTransactionsInput = {
@@ -1363,6 +1515,7 @@ export type UserUncheckedUpdateWithoutRecurringTransactionsInput = {
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -1383,6 +1536,7 @@ export type UserCreateWithoutNotificationsInput = {
   budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -1403,6 +1557,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
   exportLogs?: Prisma.ExportLogUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -1439,6 +1594,7 @@ export type UserUpdateWithoutNotificationsInput = {
   budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -1459,6 +1615,7 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
   exportLogs?: Prisma.ExportLogUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExportLogsInput = {
@@ -1479,6 +1636,7 @@ export type UserCreateWithoutExportLogsInput = {
   budgets?: Prisma.BudgetCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExportLogsInput = {
@@ -1499,6 +1657,7 @@ export type UserUncheckedCreateWithoutExportLogsInput = {
   budgets?: Prisma.BudgetUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedCreateNestedManyWithoutUserInput
+  anomalies?: Prisma.AnomalyUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExportLogsInput = {
@@ -1535,6 +1694,7 @@ export type UserUpdateWithoutExportLogsInput = {
   budgets?: Prisma.BudgetUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExportLogsInput = {
@@ -1555,6 +1715,7 @@ export type UserUncheckedUpdateWithoutExportLogsInput = {
   budgets?: Prisma.BudgetUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   recurringTransactions?: Prisma.RecurringTransactionUncheckedUpdateManyWithoutUserNestedInput
+  anomalies?: Prisma.AnomalyUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1572,6 +1733,7 @@ export type UserCountOutputType = {
   notifications: number
   recurringTransactions: number
   exportLogs: number
+  anomalies: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1584,6 +1746,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   recurringTransactions?: boolean | UserCountOutputTypeCountRecurringTransactionsArgs
   exportLogs?: boolean | UserCountOutputTypeCountExportLogsArgs
+  anomalies?: boolean | UserCountOutputTypeCountAnomaliesArgs
 }
 
 /**
@@ -1659,6 +1822,13 @@ export type UserCountOutputTypeCountExportLogsArgs<ExtArgs extends runtime.Types
   where?: Prisma.ExportLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAnomaliesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnomalyWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1679,6 +1849,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   recurringTransactions?: boolean | Prisma.User$recurringTransactionsArgs<ExtArgs>
   exportLogs?: boolean | Prisma.User$exportLogsArgs<ExtArgs>
+  anomalies?: boolean | Prisma.User$anomaliesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1727,6 +1898,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   recurringTransactions?: boolean | Prisma.User$recurringTransactionsArgs<ExtArgs>
   exportLogs?: boolean | Prisma.User$exportLogsArgs<ExtArgs>
+  anomalies?: boolean | Prisma.User$anomaliesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1745,6 +1917,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     recurringTransactions: Prisma.$RecurringTransactionPayload<ExtArgs>[]
     exportLogs: Prisma.$ExportLogPayload<ExtArgs>[]
+    anomalies: Prisma.$AnomalyPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2159,6 +2332,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recurringTransactions<T extends Prisma.User$recurringTransactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$recurringTransactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecurringTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   exportLogs<T extends Prisma.User$exportLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$exportLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExportLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  anomalies<T extends Prisma.User$anomaliesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$anomaliesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnomalyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2821,6 +2995,30 @@ export type User$exportLogsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.ExportLogScalarFieldEnum | Prisma.ExportLogScalarFieldEnum[]
+}
+
+/**
+ * User.anomalies
+ */
+export type User$anomaliesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Anomaly
+   */
+  select?: Prisma.AnomalySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Anomaly
+   */
+  omit?: Prisma.AnomalyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnomalyInclude<ExtArgs> | null
+  where?: Prisma.AnomalyWhereInput
+  orderBy?: Prisma.AnomalyOrderByWithRelationInput | Prisma.AnomalyOrderByWithRelationInput[]
+  cursor?: Prisma.AnomalyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnomalyScalarFieldEnum | Prisma.AnomalyScalarFieldEnum[]
 }
 
 /**

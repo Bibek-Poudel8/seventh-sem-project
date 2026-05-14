@@ -392,6 +392,7 @@ export const ModelName = {
   Category: 'Category',
   PaymentMethod: 'PaymentMethod',
   Transaction: 'Transaction',
+  Anomaly: 'Anomaly',
   Budget: 'Budget',
   RecurringTransaction: 'RecurringTransaction',
   Notification: 'Notification',
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "session" | "verificationToken" | "user" | "userProfile" | "category" | "paymentMethod" | "transaction" | "budget" | "recurringTransaction" | "notification" | "exportLog"
+    modelProps: "account" | "session" | "verificationToken" | "user" | "userProfile" | "category" | "paymentMethod" | "transaction" | "anomaly" | "budget" | "recurringTransaction" | "notification" | "exportLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1007,6 +1008,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Anomaly: {
+      payload: Prisma.$AnomalyPayload<ExtArgs>
+      fields: Prisma.AnomalyFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AnomalyFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AnomalyFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>
+        }
+        findFirst: {
+          args: Prisma.AnomalyFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AnomalyFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>
+        }
+        findMany: {
+          args: Prisma.AnomalyFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>[]
+        }
+        create: {
+          args: Prisma.AnomalyCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>
+        }
+        createMany: {
+          args: Prisma.AnomalyCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AnomalyCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>[]
+        }
+        delete: {
+          args: Prisma.AnomalyDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>
+        }
+        update: {
+          args: Prisma.AnomalyUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>
+        }
+        deleteMany: {
+          args: Prisma.AnomalyDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AnomalyUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AnomalyUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>[]
+        }
+        upsert: {
+          args: Prisma.AnomalyUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AnomalyPayload>
+        }
+        aggregate: {
+          args: Prisma.AnomalyAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAnomaly>
+        }
+        groupBy: {
+          args: Prisma.AnomalyGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnomalyGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AnomalyCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AnomalyCountAggregateOutputType> | number
+        }
+      }
+    }
     Budget: {
       payload: Prisma.$BudgetPayload<ExtArgs>
       fields: Prisma.BudgetFieldRefs
@@ -1470,6 +1545,19 @@ export const TransactionScalarFieldEnum = {
 export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
 
 
+export const AnomalyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  transactionId: 'transactionId',
+  score: 'score',
+  reason: 'reason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AnomalyScalarFieldEnum = (typeof AnomalyScalarFieldEnum)[keyof typeof AnomalyScalarFieldEnum]
+
+
 export const BudgetScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1906,6 +1994,7 @@ export type GlobalOmitConfig = {
   category?: Prisma.CategoryOmit
   paymentMethod?: Prisma.PaymentMethodOmit
   transaction?: Prisma.TransactionOmit
+  anomaly?: Prisma.AnomalyOmit
   budget?: Prisma.BudgetOmit
   recurringTransaction?: Prisma.RecurringTransactionOmit
   notification?: Prisma.NotificationOmit
