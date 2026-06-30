@@ -77,7 +77,7 @@ async function main() {
   console.log('Seeding transactions using existing categories (will not create categories)')
 
   // Use provided seed user id (can be overridden with SEED_USER_ID env var)
-  const DEFAULT_SEED_USER_ID = 'cmoxxubx40000kwk40f9v31dg'
+  const DEFAULT_SEED_USER_ID = 'cmp2r9bky0001lmqva8j0wtbl'
   const seedUserId = process.env.SEED_USER_ID ?? DEFAULT_SEED_USER_ID
 
   let user = await prisma.user.findUnique({ where: { id: seedUserId } })
