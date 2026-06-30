@@ -14,14 +14,17 @@ import {
 } from "@/components/ui/select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCamera,
   faCircleInfo,
   faMagic,
   faPlus,
   faSpinner,
+  faTriangleExclamation,
   faWandSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { createTransaction, TransactionActionState } from "./actions";
 import { TransactionCategory } from "./transaction-types";
+import { extractBillData } from "@/services/ai.service";
 
 export default function TransactionForm({
   categories,
@@ -39,7 +42,17 @@ export default function TransactionForm({
   const [aiMessage, setAiMessage] = useState("");
   const [aiCategoryRaw, setAiCategoryRaw] = useState("");
   const [aiConfidenceScore, setAiConfidenceScore] = useState("");
+
+  // OCR-specific state. Separate from aiMessage so a low-confidence OCR
+  // warning doesn't get silently cleared the next time the category
+  // Select's onValueChange resets aiMessage.
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrWarning, setOcrWarning] = useState("");
+
   const descriptionRef = useRef<HTMLInputElement>(null);
+  const amountRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
+  const billFileInputRef = useRef<HTMLInputElement>(null);
   const anomalyCheckTransactionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -128,6 +141,80 @@ export default function TransactionForm({
     }
   };
 
+  // Mirrors handleAutoCategorize's structure closely: same hidden-input
+  // population (aiCategoryRaw, aiConfidenceScore), same findCategoryByName
+  // lookup, same aiMessage feedback line. The difference is OCR also
+  // fills description/amount/date via refs since those are uncontrolled
+  // inputs in this form (no value= prop, just defaultValue on date).
+  const handleBillUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setOcrLoading(true);
+    setOcrWarning("");
+    setAiMessage("");
+
+    try {
+      const data = await extractBillData(file);
+
+      if (!data) {
+        setOcrWarning("Could not read the bill. Please enter details manually.");
+        return;
+      }
+
+      if (descriptionRef.current && data.description) {
+        descriptionRef.current.value = data.description;
+      }
+      if (amountRef.current && data.amount !== null) {
+        amountRef.current.value = String(data.amount);
+      }
+      if (dateRef.current && data.date) {
+        dateRef.current.value = data.date;
+      }
+
+      const categoryName = data.category;
+      const confidence =
+        typeof data.confidence === "number" ? String(data.confidence) : "";
+
+      setAiCategoryRaw(typeof categoryName === "string" ? categoryName : "");
+      setAiConfidenceScore(confidence);
+
+      if (
+        categoryName &&
+        typeof categoryName === "string" &&
+        categoryName.toLowerCase() !== "uncategorized"
+      ) {
+        const matchingCategory = findCategoryByName(categoryName);
+        if (matchingCategory) {
+          setCategoryId(matchingCategory.id);
+          setAiMessage(`AI selected ${matchingCategory.name}.`);
+        }
+      }
+
+      // Surface a warning if OCR text quality or category confidence was
+      // low, so the user double-checks the pre-filled fields before
+      // submitting — same instinct as the existing "Cant help with that"
+      // message, but specific to OCR since two models are now chained.
+      if (data.ocr_low_confidence) {
+        setOcrWarning(
+          "Bill photo was hard to read — please verify the amount and date."
+        );
+      } else if (data.amount === null) {
+        setOcrWarning("Couldn't find an amount on the bill — please enter it manually.");
+      }
+    } catch (error) {
+      console.error("OCR error:", error);
+      setOcrWarning("Failed to read bill. Please enter details manually.");
+    } finally {
+      setOcrLoading(false);
+      if (billFileInputRef.current) {
+        billFileInputRef.current.value = "";
+      }
+    }
+  };
+
   const today = new Date().toLocaleDateString("en-CA", {
     timeZone: "Asia/Kathmandu",
   });
@@ -158,6 +245,43 @@ export default function TransactionForm({
       <input type="hidden" name="aiCategoryRaw" value={aiCategoryRaw} />
       <input type="hidden" name="aiConfidenceScore" value={aiConfidenceScore} />
 
+      <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-3 py-2.5">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <FontAwesomeIcon icon={faCamera} className="h-3.5 w-3.5" />
+          <span>Scan a bill to auto-fill this form</span>
+        </div>
+        <input
+          ref={billFileInputRef}
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          capture="environment"
+          onChange={handleBillUpload}
+          className="hidden"
+          id="bill-upload-input"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={ocrLoading}
+          onClick={() => billFileInputRef.current?.click()}
+          className="h-8 shrink-0 gap-2"
+        >
+          {ocrLoading ? (
+            <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <FontAwesomeIcon icon={faCamera} className="h-3.5 w-3.5" />
+          )}
+          {ocrLoading ? "Reading bill..." : "Scan bill"}
+        </Button>
+      </div>
+      {ocrWarning && (
+        <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">
+          <FontAwesomeIcon icon={faTriangleExclamation} className="h-3.5 w-3.5" />
+          {ocrWarning}
+        </p>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-1.5 sm:col-span-2">
           <Label htmlFor="description">Description *</Label>
@@ -178,6 +302,7 @@ export default function TransactionForm({
         <div className="space-y-1.5">
           <Label htmlFor="amount">Amount *</Label>
           <Input
+            ref={amountRef}
             id="amount"
             name="amount"
             type="number"
@@ -206,6 +331,7 @@ export default function TransactionForm({
         <div className="space-y-1.5">
           <Label htmlFor="date">Date *</Label>
           <Input
+            ref={dateRef}
             id="date"
             name="date"
             type="date"
