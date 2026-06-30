@@ -43,3 +43,33 @@ export async function getPredictions(userId: string): Promise<{
     return null;
   }
 }
+
+export async function extractBillData(file: File): Promise<{
+  description: string;
+  amount: number | null;
+  date: string | null;
+  category: string;
+  confidence: number;
+  method: string;
+  ocr_confidence: number;
+  ocr_low_confidence: boolean;
+  raw_text: string;
+} | null> {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+ 
+    const res = await fetch(
+      `${process.env.NEXTAUTH_URL ?? "http://localhost:3000"}/api/ai/ocr`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    if (!res.ok) throw new Error("OCR service unavailable");
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+ 
