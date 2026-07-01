@@ -19,6 +19,7 @@ const TransactionSchema = z.object({
   customCategory: z.string().optional(),
   paymentMethodId: z.string().optional(),
   notes: z.string().max(300).optional(),
+  clientTimestamp: z.string().optional(),
   isAiCategorized: z.coerce.boolean().optional(),
   aiCategoryRaw: z.string().optional(),
   aiConfidenceScore: z.coerce.number().min(0).max(1).optional(),
@@ -57,6 +58,7 @@ export async function createTransaction(
     customCategory: formData.get("customCategory") || undefined,
     paymentMethodId: formData.get("paymentMethodId") || undefined,
     notes: formData.get("notes") || undefined,
+    clientTimestamp: formData.get("clientTimestamp") || undefined,
     isAiCategorized: formData.get("isAiCategorized") || undefined,
     aiCategoryRaw: formData.get("aiCategoryRaw") || undefined,
     aiConfidenceScore: formData.get("aiConfidenceScore") || undefined,
@@ -72,6 +74,7 @@ export async function createTransaction(
     amount,
     type,
     date,
+    clientTimestamp,
     categoryId,
     customCategory,
     paymentMethodId,
@@ -108,26 +111,13 @@ export async function createTransaction(
     }
   }
 
-  const now = new Date();
-  // Get today's date in Nepal (GMT+5:45)
-  const nepaliToday = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kathmandu",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(now);
-
   let finalDate: Date;
 
-  if (date === nepaliToday) {
-    // If it's today in Nepal, use the current time
-    finalDate = now;
+  if (clientTimestamp) {
+    finalDate = new Date(clientTimestamp);
   } else {
-    // For other dates, set to 00:00:00 in Nepal timezone
-    // We create a date at 00:00 UTC and then subtract 5:45 (345 mins) to get UTC equivalent
     const [y, m, d] = date.split("-").map(Number);
     finalDate = new Date(Date.UTC(y, m - 1, d, 0, 0, 0));
-    finalDate.setMinutes(finalDate.getMinutes() - 345);
   }
 
   const transaction = await transactionService.createTransaction({
@@ -181,6 +171,7 @@ export async function updateTransaction(
     amount: formData.get("amount"),
     type: formData.get("type"),
     date: formData.get("date"),
+    clientTimestamp: formData.get("clientTimestamp") || undefined,
     categoryId: formData.get("categoryId") || undefined,
     notes: formData.get("notes") || undefined,
   };
@@ -190,24 +181,15 @@ export async function updateTransaction(
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  const { description, amount, type, date, categoryId, notes } = validated.data;
+  const { description, amount, type, date, clientTimestamp, categoryId, notes } = validated.data;
 
   let finalDate = undefined;
   if (date) {
-    const now = new Date();
-    const nepaliToday = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Asia/Kathmandu",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(now);
-
-    if (date === nepaliToday) {
-      finalDate = now;
+    if (clientTimestamp) {
+      finalDate = new Date(clientTimestamp);
     } else {
       const [y, m, d] = date.split("-").map(Number);
       finalDate = new Date(Date.UTC(y, m - 1, d, 0, 0, 0));
-      finalDate.setMinutes(finalDate.getMinutes() - 345);
     }
   }
 

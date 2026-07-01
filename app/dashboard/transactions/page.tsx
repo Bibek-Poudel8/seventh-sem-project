@@ -61,6 +61,7 @@ export default async function TransactionsPage({
   ]);
 
   const currency = profile?.currency ?? "NPR";
+  const timezone = profile?.timezone ?? "UTC";
   const page = params.page ? Number(params.page) : 1;
   const pageSize = 20;
   const totalPages = Math.ceil(total / pageSize);
@@ -88,6 +89,7 @@ export default async function TransactionsPage({
         }))}
         categories={categories}
         currency={currency}
+        timezone={timezone}
         total={total}
         page={page}
         totalPages={totalPages}

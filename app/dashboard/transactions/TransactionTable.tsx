@@ -16,6 +16,7 @@ interface Props {
   transactions: TransactionItem[];
   categories: TransactionCategory[];
   currency: string;
+  timezone: string;
   total: number;
   page: number;
   totalPages: number;
@@ -26,6 +27,7 @@ export default function TransactionTable({
   transactions,
   categories,
   currency,
+  timezone,
   total,
   page,
   totalPages,
@@ -66,7 +68,7 @@ export default function TransactionTable({
 
   return (
     <div className="space-y-4">
-      <TransactionToolbar categories={categories} searchParams={searchParams} />
+      <TransactionToolbar categories={categories} searchParams={searchParams} timezone={timezone} />
 
       <div className="rounded-lg border overflow-hidden">
         <div className="overflow-x-auto">

@@ -32,9 +32,11 @@ type SearchParams = Record<string, string | undefined>;
 export default function TransactionToolbar({
   categories,
   searchParams,
+  timezone = "UTC",
 }: {
   categories: TransactionCategory[];
-  searchParams: SearchParams;
+  searchParams: Record<string, string | undefined>;
+  timezone?: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -139,13 +141,14 @@ export default function TransactionToolbar({
               <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" /> Add
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg md:max-w-3xl lg:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Add Transaction</DialogTitle>
             </DialogHeader>
             <TransactionForm
               categories={categories}
               onSuccess={() => setAddOpen(false)}
+              timezone={timezone}
             />
           </DialogContent>
         </Dialog>

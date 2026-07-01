@@ -10,7 +10,8 @@ WITH seed(id, name, type, icon, color) AS (
     ('sys_government_legal', 'Government & Legal', 'EXPENSE'::"TransactionType", 'scale', '#4B5563'),
     ('sys_charity_donations', 'Charity & Donations', 'EXPENSE'::"TransactionType", 'hand-heart', '#EA580C'),
     ('sys_income', 'Income', 'INCOME'::"TransactionType", 'wallet', '#059669'),
-    ('sys_miscellaneous', 'Miscellaneous', 'EXPENSE'::"TransactionType", 'circle-help', '#64748B')
+    ('sys_miscellaneous', 'Miscellaneous', 'EXPENSE'::"TransactionType", 'circle-help', '#64748B'),
+    ('sys_education', 'Education', 'EXPENSE'::"TransactionType", 'user-graduate', '#2563EB')
 ),
 updated AS (
   UPDATE "categories" c
