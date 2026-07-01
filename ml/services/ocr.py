@@ -2,8 +2,16 @@
 OCR service for bill/receipt image processing.
 
 Pipeline: image bytes -> preprocess (grayscale, denoise, threshold) ->
-Tesseract OCR -> regex field extraction (amount, merchant, date) ->
-hands merchant text off to categorizer.predict() for category + confidence.
+Tesseract OCR -> regex field extraction (amount, merchant, date, items) ->
+build a natural-language description from merchant + item-derived hint ->
+pass that single description string to categorizer.predict().
+
+The description fed to categorizer.predict() is always shaped like a real
+user-typed transaction description — e.g. "Health Plus Pharmacy medicine
+purchase", "Green Mart grocery shopping" — rather than a raw merchant name
+or comma-joined item list. The TF-IDF + logistic regression model was
+trained on human-written descriptions, so inputs that resemble training
+data get better confidence scores and more reliable keyword-rule matches.
 
 Follows the same dict-in / dict-out convention as categorizer.py and
 anomaly.py so router.py can dispatch to it identically.
@@ -197,43 +205,98 @@ def _extract_merchant(raw_text: str) -> str:
     """
     Merchant name extraction tries strongest signal first, weakest last.
 
-    Many receipts put the merchant name in a closing line like "Thank you
-    for shopping with Green Mart!" rather than (or in addition to) the
-    header — the header often starts with a street address instead. We
-    check for that explicit phrasing first since it's unambiguous, then
-    fall back to scanning the first few lines for a plausible-looking
-    store name, explicitly skipping lines that look like a street address.
+    Logo-containing receipts break the naive 'first plausible line' approach
+    in two ways: (a) the logo occupies the left column, causing Tesseract to
+    merge logo glyphs with the text beside them, or (b) it reads the address
+    block before the store name when the logo shifts scan order. In the worst
+    case — common with restaurant receipts that have decorative logos — the
+    store name is completely absent from Tesseract output, merged entirely
+    into garbled glyph characters. The tiered strategy handles this:
+
+    Tier 1: closing phrase with store name ("Thank you for shopping with X")
+    Tier 2: ALL-CAPS line scan across first 12 lines (skips taglines)
+    Tier 3: dining/restaurant context signal → graceful "Restaurant" fallback
+    Tier 4: invoice number prefix as last-resort identifier
+    Tier 5: first plausible non-tagline line (original fallback)
     """
     lines = [l.strip() for l in raw_text.split('\n') if l.strip()]
 
-    # Tier 1: explicit closing-line signal phrases. These are the most
-    # reliable signal when present — "shopping with X" or "welcome to X"
-    # essentially never refers to anything other than the store name.
+    # Tier 1: explicit closing signal phrase containing the store name.
     signal_pattern = re.compile(
-        r'(?:thank\s*you\s*for\s*shopping\s*(?:with|at)|'
-        r'welcome\s*to|visit\s*us\s*at)\s*([A-Za-z0-9&\'\-\s]+?)[!.\n]',
+        r'(?:thank\s*you\s*for\s*(?:shopping|choosing)\s*(?:with|at|from)?|'
+        r'welcome\s*to|visit\s*us\s*(?:at|again)?)\s*([A-Za-z0-9&\'\-\s]+?)[!.\n]',
         re.IGNORECASE,
     )
     for line in lines:
-        match = signal_pattern.search(line + '!')  # ensure a terminator exists
+        match = signal_pattern.search(line + '!')
         if match:
             candidate = match.group(1).strip()
             if len(candidate) >= 2:
                 return candidate.title()
 
-    # Tier 2: scan the first few lines for a plausible store name, skipping
-    # lines that look like dates, pure numbers, phone/web contact info, or
-    # street addresses (digits followed by a street-type word, or any line
-    # containing a comma immediately after a number — typical of
-    # "123 Market Street, City").
+    # Lines to always skip — dates, numbers, contact info, addresses.
+    # Includes restaurant-specific operational fields (waiter, table no,
+    # time) and common Nepali address words.
     skip_pattern = re.compile(
-        r'^\d+$|^\d{1,2}[/\-]\d{1,2}|receipt|invoice|tel:|phone:|www\.|^\W+$|'
-        r'^\d+\s+[\w\s]+(?:street|st\.|road|rd\.|avenue|ave\.|lane|marg)\b',
+        r'^\d+$|^\d{1,2}[/\-]\d{1,2}|receipt|invoice|tel:|phone:|www\.|'
+        r'vat|pan\s*no|^\W+$|waiter|cashier|table\s*no|time:|'
+        r'^\d+\s+[\w\s]+(?:street|st\.|road|rd\.|avenue|ave\.|lane|'
+        r'marg|sadak|chowk|tole)\b',
         re.IGNORECASE,
     )
 
+    # Taglines and slogans — skip these even if they look like clean text.
+    # A store name is never a sentence with ! or motivational adjectives.
+    # "Good Food, Good Mood!" and "Hope to serve you again!" both match.
+    tagline_pattern = re.compile(
+        r'!|'
+        r'\b(?:good|best|fresh|quality|pure|trusted|delicious|'
+        r'healthy|serving|welcome|hope|mood|always|proud|since)\b',
+        re.IGNORECASE,
+    )
+
+    # Tier 2: ALL-CAPS store name scan — tolerates address appearing before
+    # the name, also now skips taglines (e.g. "GOOD FOOD GOOD MOOD" would
+    # otherwise be a false ALL-CAPS match).
+    all_caps_pattern = re.compile(r'^[A-Z][A-Z\s&\'\-\.]{4,}$')
+    for line in lines[:12]:
+        if skip_pattern.search(line) or tagline_pattern.search(line):
+            continue
+        if all_caps_pattern.match(line) and len(line) >= 4:
+            return line.title()
+
+    # Tier 3: dining/restaurant context — when the store name is completely
+    # lost to logo interference (e.g. this Spice Route receipt), at least
+    # return a meaningful generic name that categorizes correctly as
+    # Food & Dining rather than falling through to a garbled glyph string.
+    dining_signal = re.compile(
+        r'dining|dine|waiter|table\s*no|hope\s*to\s*serve|'
+        r'thank\s*you\s*for\s*(?:visiting|dining)',
+        re.IGNORECASE,
+    )
+    if dining_signal.search(raw_text):
+        return 'Restaurant'
+
+    # Tier 4: invoice number prefix as last-resort identifier.
+    # "Invoice No.: SRR-20260630-0551" → prefix "SRR" is likely the
+    # store's initials. Not decodable to a real name, but better than
+    # "Unknown Merchant" for a user who can see their own receipt.
+    invoice_pattern = re.compile(
+        r'invoice\s*no\.?\s*[:\-]?\s*([A-Z]{2,5})-\d',
+        re.IGNORECASE,
+    )
+    inv_match = invoice_pattern.search(raw_text)
+    if inv_match:
+        prefix = inv_match.group(1).upper()
+        if len(prefix) >= 2:
+            return f'Store ({prefix})'
+
+    # Tier 5: original first-plausible-line fallback, now also skipping
+    # taglines to prevent "Good Food, Good Mood!" from being selected.
     for line in lines[:5]:
-        if not skip_pattern.search(line) and len(line) >= 3:
+        if (not skip_pattern.search(line)
+                and not tagline_pattern.search(line)
+                and len(line) >= 3):
             return line.title()
 
     return 'Unknown Merchant'
@@ -260,10 +323,12 @@ def _extract_items(raw_text: str) -> list:
     )
 
     # Summary/header rows can occasionally have a similar numeric shape
-    # by coincidence — explicitly excluded as a safety net.
+    # by coincidence — explicitly excluded as a safety net. Covers both
+    # "Item Qty Rate" (grocery) and "Medicine / Product Qty Rate" (pharmacy)
+    # column header variants.
     exclude_pattern = re.compile(
         r'subtotal|^total|grand\s*total|discount|tax|vat|amount\s*paid|'
-        r'change|payment|item\s+qty\s+rate',
+        r'change|payment|item\s+qty|medicine\s*/\s*product|product\s+qty',
         re.IGNORECASE,
     )
 
@@ -275,13 +340,112 @@ def _extract_items(raw_text: str) -> list:
         match = item_row_pattern.match(line)
         if match:
             item_name = match.group(1).strip()
-            # Strip a trailing parenthetical like "(250g)" or "(1L)" so
-            # the categorizer sees the product noun, not packaging size.
+            # Strip trailing parenthetical packaging like "(250g)", "(10s)",
+            # "(Multivitamin)" so the categorizer sees the product noun only.
             item_name = re.sub(r'\s*\([^)]*\)\s*$', '', item_name).strip()
+            # Strip trailing dosage/size suffixes common on medical receipts:
+            # "Paracetamol 500mg" → "Paracetamol", "Cough Syrup 100ml" →
+            # "Cough Syrup", "Pain Relief Gel 30g" → "Pain Relief Gel".
+            item_name = re.sub(
+                r'\s+\d+\s*(?:mg|ml|g|kg|mcg|iu|tab|caps?)\b', '',
+                item_name, flags=re.IGNORECASE,
+            ).strip()
             if item_name:
                 item_names.append(item_name)
 
     return item_names
+
+
+# ── Description builder ───────────────────────────────────────────────────
+
+# Maps item vocabulary to a short natural-language hint word that, when
+# appended to the merchant name, produces a description that resembles
+# what a user would actually type. The hint is chosen by scanning the
+# extracted item names for any keyword match — first match wins, since
+# a pharmacy receipt won't contain food items and vice versa.
+# These keyword lists deliberately use the same vocabulary that your
+# KEYWORD_RULES in categorizer.py are likely trained on, so the hint
+# triggers the keyword-rule path (confidence 1.0) rather than the slower
+# TF-IDF path wherever possible.
+_ITEM_HINT_RULES: list[tuple[list[str], str]] = [
+    # Healthcare: drug names, medical product terms
+    (
+        ["paracetamol", "amoxicillin", "cetirizine", "ibuprofen", "aspirin",
+         "antibiotic", "syrup", "tablet", "capsule", "ors", "vitamin",
+         "supplement", "gel", "cream", "ointment", "bandage", "medicine",
+         "pharmacy", "drug", "injection", "vaccine", "insulin"],
+        "medicine purchase",
+    ),
+    # Food & dining: grocery items AND restaurant/dining items.
+    # "restaurant" and "dining" are added so the generic "Restaurant"
+    # merchant fallback also triggers this rule via the merchant-name
+    # scan in _build_description.
+    (
+        ["rice", "milk", "bread", "egg", "flour", "oil", "sugar", "salt",
+         "tea", "coffee", "biscuit", "butter", "cheese", "vegetable",
+         "fruit", "meat", "chicken", "fish", "noodle", "pasta", "cereal",
+         "grocery", "groceries", "snack", "spice", "sauce", "juice",
+         "momo", "chowmein", "curry", "dal", "roti", "burger", "pizza",
+         "sandwich", "soup", "salad", "dessert", "lemonade", "lassi",
+         "restaurant", "dining", "cafe", "canteen", "hotel", "eatery"],
+        "food dining",
+    ),
+    # Transportation: fuel and vehicle items
+    (
+        ["petrol", "diesel", "fuel", "tyre", "tire", "engine", "oil filter",
+         "brake", "battery", "parking", "toll", "lubricant"],
+        "fuel and transport",
+    ),
+    # Entertainment
+    (
+        ["movie", "ticket", "game", "sport", "gym", "fitness", "concert",
+         "event", "streaming", "subscription"],
+        "entertainment",
+    ),
+    # Utilities
+    (
+        ["electricity", "water", "internet", "broadband", "wifi", "gas",
+         "recharge", "topup", "bill payment"],
+        "utility bill",
+    ),
+    # Shopping & retail: clothing, electronics, household
+    (
+        ["shirt", "pant", "shoe", "dress", "jacket", "cloth", "laptop",
+         "phone", "charger", "cable", "headphone", "furniture", "appliance",
+         "stationery", "pen", "notebook", "bag"],
+        "shopping",
+    ),
+]
+
+
+def _build_description(merchant: str, items: list[str]) -> str:
+    """
+    Builds a single natural-language description string to pass to
+    categorizer.predict(). The output is shaped like what a user would
+    actually type — "Health Plus Pharmacy medicine purchase" — rather
+    than a raw merchant name or comma-joined item list.
+
+    Logic:
+    1. If items were extracted, scan each item (lowercased) against
+       _ITEM_HINT_RULES and append the first matching hint to the
+       merchant name.
+    2. If no item matches any rule, also check the merchant name itself
+       against the same rules — "Health Plus Pharmacy" contains "pharmacy"
+       which matches the healthcare rule even with zero items extracted.
+    3. If nothing matches at all, return just the merchant name unchanged
+       so the categorizer falls back to its normal behaviour for bare names.
+    """
+    search_targets = [item.lower() for item in items] + [merchant.lower()]
+
+    for keywords, hint in _ITEM_HINT_RULES:
+        for target in search_targets:
+            if any(kw in target for kw in keywords):
+                return f"{merchant} {hint}"
+
+    # No rule matched — return merchant name alone. The categorizer's
+    # keyword rules and TF-IDF model may still find a match; we just
+    # can't add a hint that would be more accurate than nothing.
+    return merchant
 
 
 # ── Public entry point (called by router.py) ───────────────────────────────
@@ -313,11 +477,20 @@ def extract(image_bytes: bytes) -> dict:
     merchant = _extract_merchant(raw_text)
     items = _extract_items(raw_text)
 
-    categorization_input = ', '.join(items) if items else merchant
-    category_result = categorizer.predict(categorization_input)
+    # Build a natural-language description for the categorizer — shaped
+    # like a real user-typed description rather than a raw merchant name
+    # or comma-joined item list. This is the only string passed to
+    # categorizer.predict(); 'description' returned to the frontend is
+    # always the plain merchant name so the transaction list stays readable.
+    categorization_description = _build_description(merchant, items)
+    category_result = categorizer.predict(categorization_description)
 
     return {
+        # What the user sees in TransactionForm and their transaction list.
         'description': merchant,
+        # What was actually fed to categorizer.predict() — exposed for
+        # debugging so you can see exactly why a category was chosen.
+        'categorization_description': categorization_description,
         'amount': amount,
         'date': date,
         'category': category_result['category'],
