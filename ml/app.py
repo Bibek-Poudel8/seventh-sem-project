@@ -110,11 +110,11 @@ def anomaly_check(body: AnomalyCheckRequest):
 # can't parse file uploads the way they parse the request bodies above.
 @app.post('/ocr')
 async def ocr_extract(file: UploadFile = File(...)):
-    allowed_types = {'image/jpeg', 'image/jpg', 'image/png', 'image/webp'}
+    allowed_types = {'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'}
     if file.content_type not in allowed_types:
         raise HTTPException(
             status_code=400,
-            detail=f'Unsupported file type: {file.content_type}. Use JPEG, PNG, or WebP.'
+            detail=f'Unsupported file type: {file.content_type}. Use JPEG, PNG, WebP, or PDF.'
         )
 
     image_bytes = await file.read()
