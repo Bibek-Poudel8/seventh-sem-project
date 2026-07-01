@@ -248,12 +248,12 @@ export default function TransactionForm({
       <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-3 py-2.5">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <FontAwesomeIcon icon={faCamera} className="h-3.5 w-3.5" />
-          <span>Scan a bill to auto-fill this form</span>
+          <span>Scan a bill photo or PDF to auto-fill this form</span>
         </div>
         <input
           ref={billFileInputRef}
           type="file"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
+          accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
           capture="environment"
           onChange={handleBillUpload}
           className="hidden"
