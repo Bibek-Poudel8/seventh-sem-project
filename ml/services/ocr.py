@@ -1,10 +1,14 @@
 """
-OCR service for bill/receipt image processing.
+OCR service for bill/receipt image and PDF processing.
 
-Pipeline: image bytes -> preprocess (grayscale, denoise, threshold) ->
-Tesseract OCR -> regex field extraction (amount, merchant, date, items) ->
-build a natural-language description from merchant + item-derived hint ->
-pass that single description string to categorizer.predict().
+Supports: JPEG, PNG, WebP (image files) and PDF (single or multi-page).
+
+Pipeline:
+  image file  → _preprocess() → Tesseract
+  PDF file    → _pdf_to_images() → _preprocess() per page → Tesseract per page
+                → concatenate raw text from all pages
+  raw text    → field extraction (merchant, amount, date, items)
+              → _build_description() → categorizer.predict()
 
 The description fed to categorizer.predict() is always shaped like a real
 user-typed transaction description — e.g. "Health Plus Pharmacy medicine
@@ -22,6 +26,7 @@ import re
 from datetime import datetime
 
 import cv2
+import fitz  # pymupdf — PDF to image conversion, no external binary needed
 import numpy as np
 import pytesseract
 from PIL import Image
@@ -50,6 +55,58 @@ DATE_FORMATS = [
     '%d %b %Y', '%d %B %Y',
     '%b %d, %Y', '%B %d, %Y',
 ]
+
+
+import os
+import platform
+
+# Windows: pytesseract can't auto-detect the binary from PATH reliably.
+# conda-forge install puts it on PATH on Mac/Linux but not always on Windows.
+if platform.system() == "Windows":
+    _win_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    if os.path.exists(_win_path):
+        pytesseract.pytesseract.tesseract_cmd = _win_path
+
+
+# ── PDF detection and conversion ────────────────────────────────────────────
+
+def _is_pdf(file_bytes: bytes) -> bool:
+    """
+    Detect PDF by magic bytes (%PDF- at offset 0) rather than trusting
+    the content-type header, which can be wrong when the user uploads
+    from a mobile browser or renames the file.
+    """
+    return file_bytes[:4] == b'%PDF'
+
+
+def _pdf_to_images(pdf_bytes: bytes) -> list[bytes]:
+    """
+    Convert each page of a PDF into a PNG image (as raw bytes) using
+    pymupdf (fitz). Returns a list of PNG byte strings, one per page.
+
+    Why pymupdf over alternatives:
+    - pdf2image requires the poppler binary (OS-level install, like tesseract)
+    - pdfplumber/pdfminer extract text but can't handle scanned PDFs
+    - pymupdf is pure Python, handles both digital and scanned PDFs, and
+      produces high-quality rasterized images at configurable DPI.
+
+    300 DPI is the minimum Tesseract needs for reliable OCR on standard
+    receipt text (typically 8-10pt). Going higher adds processing time
+    with diminishing accuracy returns for printed receipts.
+    """
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    images = []
+
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)
+        # Matrix scales the page to ~300 DPI (default PDF unit = 72 DPI,
+        # so scale factor 300/72 ≈ 4.17).
+        mat = fitz.Matrix(300 / 72, 300 / 72)
+        pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB)
+        images.append(pix.tobytes("png"))
+
+    doc.close()
+    return images
 
 
 # ── Image preprocessing ─────────────────────────────────────────────────────
@@ -450,54 +507,66 @@ def _build_description(merchant: str, items: list[str]) -> str:
 
 # ── Public entry point (called by router.py) ───────────────────────────────
 
-def extract(image_bytes: bytes) -> dict:
+def extract(file_bytes: bytes) -> dict:
     """
-    Full OCR pipeline: preprocess -> Tesseract -> field extraction ->
-    categorization. Field names (description, amount, date) are chosen
-    to match TransactionForm's actual form field names directly, so the
-    frontend can drop the response straight into form state.
+    Full OCR pipeline: detect format → preprocess → Tesseract →
+    field extraction → categorization.
 
-    Categorization input: if item lines were found (a detailed receipt
-    with qty/rate/amount columns), we categorize using the joined item
-    list — e.g. "Coffee, Milk, Rice, Eggs" — since product names are a
-    much stronger signal for categorizer.predict() than a store name
-    like "Green Mart" that the keyword rules and TF-IDF model have
-    likely never seen. If no item lines were detected (a simple receipt,
-    or one Tesseract read too poorly to find the qty/rate/amount
-    pattern), we fall back to categorizing on the merchant name alone,
-    same as before. Either way, `description` shown to the user is
-    always the merchant name — only the categorizer's input changes.
+    For PDFs: each page is converted to a PNG image, preprocessed, and
+    run through Tesseract independently. Raw text from all pages is
+    concatenated with a page separator so multi-page receipts work
+    correctly (e.g. a PDF invoice with items on page 1 and total on page 2).
+
+    For images: same single-page flow as before.
+
+    Either way, field extraction and categorization operate on the same
+    plain text string — no branching needed after this point.
     """
-    processed = _preprocess(image_bytes)
-    ocr_result = _run_tesseract(processed)
-    raw_text = ocr_result['raw_text']
+    if _is_pdf(file_bytes):
+        page_images = _pdf_to_images(file_bytes)
+
+        all_raw_text = []
+        all_confidences = []
+
+        for page_bytes in page_images:
+            processed = _preprocess(page_bytes)
+            ocr_result = _run_tesseract(processed)
+            all_raw_text.append(ocr_result['raw_text'])
+            if ocr_result['avg_confidence'] > 0:
+                all_confidences.append(ocr_result['avg_confidence'])
+
+        # Join pages with a clear separator so field-extraction regexes
+        # don't accidentally merge the last word of one page with the
+        # first word of the next.
+        raw_text = '\n--- PAGE BREAK ---\n'.join(all_raw_text)
+        avg_confidence = (
+            sum(all_confidences) / len(all_confidences)
+            if all_confidences else 0.0
+        )
+    else:
+        processed = _preprocess(file_bytes)
+        ocr_result = _run_tesseract(processed)
+        raw_text = ocr_result['raw_text']
+        avg_confidence = ocr_result['avg_confidence']
 
     amount = _extract_amount(raw_text)
     date = _extract_date(raw_text)
     merchant = _extract_merchant(raw_text)
     items = _extract_items(raw_text)
 
-    # Build a natural-language description for the categorizer — shaped
-    # like a real user-typed description rather than a raw merchant name
-    # or comma-joined item list. This is the only string passed to
-    # categorizer.predict(); 'description' returned to the frontend is
-    # always the plain merchant name so the transaction list stays readable.
     categorization_description = _build_description(merchant, items)
     category_result = categorizer.predict(categorization_description)
 
     return {
-        # What the user sees in TransactionForm and their transaction list.
         'description': merchant,
-        # What was actually fed to categorizer.predict() — exposed for
-        # debugging so you can see exactly why a category was chosen.
         'categorization_description': categorization_description,
         'amount': amount,
         'date': date,
         'category': category_result['category'],
         'confidence': category_result['confidence'],
         'method': category_result['method'],
-        'ocr_confidence': ocr_result['avg_confidence'],
-        'ocr_low_confidence': ocr_result['avg_confidence'] < LOW_OCR_CONFIDENCE_THRESHOLD,
+        'ocr_confidence': avg_confidence,
+        'ocr_low_confidence': avg_confidence < LOW_OCR_CONFIDENCE_THRESHOLD,
         'items': items,
         'raw_text': raw_text,
     }
