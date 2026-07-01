@@ -51,8 +51,13 @@ export async function GET(req: NextRequest) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-
   const results: AnomalyResult[] = await res.json();
+
+  console.log("[ML Response] All results:", JSON.stringify(results, null, 2));
+  console.log("[ML Response] Anomalies found:", results.filter((r) => r.is_anomaly).length);
+  results.filter((r) => r.is_anomaly).forEach((r) => {
+    console.log(`[ML Anomaly] ${r.id} | score: ${r.anomaly_score} | reason: ${r.anomaly_reason}`);
+  });
 
   // Update anomaly fields in database for flagged transactions
   const anomalous = results.filter((r) => r.is_anomaly);

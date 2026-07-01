@@ -29,14 +29,17 @@ import { extractBillData } from "@/services/ai.service";
 export default function TransactionForm({
   categories,
   onSuccess,
+  timezone = "UTC",
 }: {
   categories: TransactionCategory[];
   onSuccess: () => void;
+  timezone?: string;
 }) {
   const [state, action, pending] = useActionState<
     TransactionActionState,
     FormData
   >(createTransaction, undefined);
+  const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [categorizingLoading, setCategorizingLoading] = useState(false);
   const [aiMessage, setAiMessage] = useState("");
@@ -48,8 +51,8 @@ export default function TransactionForm({
   // Select's onValueChange resets aiMessage.
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrWarning, setOcrWarning] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
 
-  const descriptionRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
   const billFileInputRef = useRef<HTMLInputElement>(null);
@@ -90,12 +93,9 @@ export default function TransactionForm({
   const findCategoryByName = (name: string) =>
     categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
 
-  const handleAutoCategorize = async () => {
-    const description = descriptionRef.current?.value.trim();
-    if (!description) {
-      setAiMessage("Add a description first.");
-      return;
-    }
+  const handleAutoCategorize = async (descriptionVal: string) => {
+    const trimmed = descriptionVal.trim();
+    if (!trimmed) return;
 
     setCategorizingLoading(true);
     setAiMessage("");
@@ -103,7 +103,7 @@ export default function TransactionForm({
       const response = await fetch("/api/ai/categorize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({ description: trimmed }),
       });
 
       if (!response.ok) throw new Error("Failed to categorize");
@@ -141,17 +141,28 @@ export default function TransactionForm({
     }
   };
 
+  // Run auto-categorization when description changes (debounced)
+  useEffect(() => {
+    const trimmed = description.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const handler = setTimeout(() => {
+      void handleAutoCategorize(trimmed);
+    }, 600);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [description]);
+
   // Mirrors handleAutoCategorize's structure closely: same hidden-input
   // population (aiCategoryRaw, aiConfidenceScore), same findCategoryByName
   // lookup, same aiMessage feedback line. The difference is OCR also
   // fills description/amount/date via refs since those are uncontrolled
   // inputs in this form (no value= prop, just defaultValue on date).
-  const handleBillUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processBillFile = async (file: File) => {
     setOcrLoading(true);
     setOcrWarning("");
     setAiMessage("");
@@ -164,8 +175,8 @@ export default function TransactionForm({
         return;
       }
 
-      if (descriptionRef.current && data.description) {
-        descriptionRef.current.value = data.description;
+      if (data.description) {
+        setDescription(data.description);
       }
       if (amountRef.current && data.amount !== null) {
         amountRef.current.value = String(data.amount);
@@ -215,14 +226,50 @@ export default function TransactionForm({
     }
   };
 
+  const handleBillUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    void processBillFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    void processBillFile(file);
+  };
+
   const today = new Date().toLocaleDateString("en-CA", {
-    timeZone: "Asia/Kathmandu",
+    timeZone: timezone,
   });
+
+  const clientTimestampRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     if (!categoryId) {
       setAiMessage("Please choose a category.");
       e.preventDefault();
+    }
+    const now = new Date();
+    const localStr = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60000,
+    ).toISOString();
+    if (clientTimestampRef.current) {
+      clientTimestampRef.current.value = localStr;
     }
   };
 
@@ -230,13 +277,14 @@ export default function TransactionForm({
     <form
       action={action}
       onSubmit={handleSubmit}
-      className="space-y-5 rounded-lg bg-card p-4 "
+      className="rounded-lg bg-card p-1"
     >
       {state?.message && (
-        <div className="rounded-lg bg-destructive/15 px-3 py-2 text-sm text-destructive">
+        <div className="mb-4 rounded-lg bg-destructive/15 px-3 py-2 text-sm text-destructive">
           {state.message}
         </div>
       )}
+      <input ref={clientTimestampRef} type="hidden" name="clientTimestamp" />
       <input
         type="hidden"
         name="isAiCategorized"
@@ -245,179 +293,187 @@ export default function TransactionForm({
       <input type="hidden" name="aiCategoryRaw" value={aiCategoryRaw} />
       <input type="hidden" name="aiConfidenceScore" value={aiConfidenceScore} />
 
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-3 py-2.5">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <FontAwesomeIcon icon={faCamera} className="h-3.5 w-3.5" />
-          <span>Scan a bill to auto-fill this form</span>
-        </div>
-        <input
-          ref={billFileInputRef}
-          type="file"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          capture="environment"
-          onChange={handleBillUpload}
-          className="hidden"
-          id="bill-upload-input"
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={ocrLoading}
-          onClick={() => billFileInputRef.current?.click()}
-          className="h-8 shrink-0 gap-2"
-        >
-          {ocrLoading ? (
-            <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <FontAwesomeIcon icon={faCamera} className="h-3.5 w-3.5" />
-          )}
-          {ocrLoading ? "Reading bill..." : "Scan bill"}
-        </Button>
-      </div>
-      {ocrWarning && (
-        <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">
-          <FontAwesomeIcon icon={faTriangleExclamation} className="h-3.5 w-3.5" />
-          {ocrWarning}
-        </p>
-      )}
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="description">Description *</Label>
-          <Input
-            ref={descriptionRef}
-            id="description"
-            name="description"
-            placeholder="e.g. Grocery shopping"
-            required
-            className="h-10"
-          />
-          {state?.errors?.description && (
-            <p className="text-xs text-destructive">
-              {state.errors.description[0]}
+      <div className="flex flex-col md:flex-row gap-5 max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible p-1.5">
+        {/* Left Side: Optional File Input / Bill Scanner */}
+        <div className="flex flex-col gap-1.5 w-full md:w-5/12 lg:w-1/3 shrink-0">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Upload Bill (Optional)
+          </Label>
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => billFileInputRef.current?.click()}
+            className={`flex flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed p-4 transition-colors text-center cursor-pointer min-h-[140px] md:h-full md:min-h-[220px] ${isDragging
+              ? "border-primary bg-primary/10"
+              : "border-muted-foreground/30 bg-muted/30 hover:bg-muted/50"
+              }`}
+          >
+            <input
+              ref={billFileInputRef}
+              type="file"
+              accept="image/jpeg,image/jpg,image/png,image/webp"
+              capture="environment"
+              onChange={handleBillUpload}
+              className="hidden"
+              id="bill-upload-input"
+            />
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="rounded-full bg-primary/10 p-2.5 text-primary">
+                {ocrLoading ? (
+                  <FontAwesomeIcon icon={faSpinner} className="h-4.5 w-4.5 animate-spin" />
+                ) : (
+                  <FontAwesomeIcon icon={faCamera} className="h-4.5 w-4.5" />
+                )}
+              </div>
+              <div>
+                <p className="text-xs font-medium">
+                  {ocrLoading ? "Reading bill..." : "Scan or upload bill"}
+                </p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  Drag & drop or click
+                </p>
+              </div>
+            </div>
+          </div>
+          {ocrWarning && (
+            <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">
+              <FontAwesomeIcon icon={faTriangleExclamation} className="h-3.5 w-3.5" />
+              {ocrWarning}
             </p>
           )}
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="amount">Amount *</Label>
-          <Input
-            ref={amountRef}
-            id="amount"
-            name="amount"
-            type="number"
-            step="0.01"
-            min="0.01"
-            placeholder="0.00"
-            required
-            className="h-10"
-          />
-          {state?.errors?.amount && (
-            <p className="text-xs text-destructive">{state.errors.amount[0]}</p>
-          )}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="type">Type *</Label>
-          <Select name="type" defaultValue="EXPENSE" required>
-            <SelectTrigger id="type" className="h-10 w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="EXPENSE">Expense</SelectItem>
-              <SelectItem value="INCOME">Income</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="date">Date *</Label>
-          <Input
-            ref={dateRef}
-            id="date"
-            name="date"
-            type="date"
-            defaultValue={today}
-            required
-            className="h-10"
-          />
-        </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="category">Category *</Label>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Select
-              name="categoryId"
-              value={categoryId}
-              onValueChange={(value) => {
-                setCategoryId(value);
-                setAiMessage("");
-              }}
-            >
-              <SelectTrigger id="category" className=" py-4 h-auto w-full">
-                <SelectValue
-                  placeholder="Select a category"
-                  className="h-auto"
-                />
-              </SelectTrigger>
-              <SelectContent className="min-w-64 ">
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleAutoCategorize}
-              disabled={categorizingLoading}
-              className=" shrink-0 gap-2 px-3"
-              title="Auto-categorize using AI"
-            >
-              {categorizingLoading ? (
+
+        {/* Right Side: Form Inputs */}
+        <div className="flex-1 space-y-3">
+          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Transaction Details
+          </Label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-1 sm:col-span-2">
+              <Label htmlFor="description">Description *</Label>
+              <Input
+                id="description"
+                name="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="e.g. Grocery shopping"
+                required
+                className="h-9"
+              />
+              {state?.errors?.description && (
+                <p className="text-xs text-destructive">
+                  {state.errors.description[0]}
+                </p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="amount">Amount *</Label>
+              <Input
+                ref={amountRef}
+                id="amount"
+                name="amount"
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                required
+                className="h-9"
+              />
+              {state?.errors?.amount && (
+                <p className="text-xs text-destructive">{state.errors.amount[0]}</p>
+              )}
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="type">Type *</Label>
+              <Select name="type" defaultValue="EXPENSE" required>
+                <SelectTrigger id="type" className="h-9 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EXPENSE">Expense</SelectItem>
+                  <SelectItem value="INCOME">Income</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="date">Date *</Label>
+              <Input
+                ref={dateRef}
+                id="date"
+                name="date"
+                type="date"
+                defaultValue={today}
+                required
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-1 sm:col-span-2">
+              <Label htmlFor="category">Category *</Label>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <Select
+                  name="categoryId"
+                  value={categoryId}
+                  onValueChange={(value) => {
+                    setCategoryId(value);
+                    setAiMessage("");
+                  }}
+                >
+                  <SelectTrigger id="category" className="h-9 w-full">
+                    <SelectValue
+                      placeholder="Select a category"
+                    />
+                  </SelectTrigger>
+                  <SelectContent className="min-w-64">
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {aiMessage && (
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  {categorizingLoading ? (
+                    <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <FontAwesomeIcon icon={faCircleInfo} className="h-3.5 w-3.5" />
+                  )}
+                  {aiMessage}
+                </p>
+              )}
+              {state?.errors?.categoryId && (
+                <p className="text-xs text-destructive">
+                  {state.errors.categoryId[0]}
+                </p>
+              )}
+            </div>
+            <div className="space-y-1 sm:col-span-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                name="notes"
+                placeholder="Optional notes..."
+                rows={2}
+                className="resize-none"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end pt-1">
+            <Button type="submit" disabled={pending} className="h-9 gap-2 w-full sm:w-auto">
+              {pending ? (
                 <FontAwesomeIcon
                   icon={faSpinner}
-                  className="h-4 w-4 animate-spin"
+                  className="h-3.5 w-3.5 animate-spin"
                 />
               ) : (
-                <FontAwesomeIcon icon={faWandSparkles} className="w-2 h-2" />
+                <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
               )}
+              Add Transaction
             </Button>
           </div>
-          {aiMessage && (
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <FontAwesomeIcon icon={faCircleInfo} className="h-3.5 w-3.5" />
-              {aiMessage}
-            </p>
-          )}
-          {state?.errors?.categoryId && (
-            <p className="text-xs text-destructive">
-              {state.errors.categoryId[0]}
-            </p>
-          )}
         </div>
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label htmlFor="notes">Notes</Label>
-          <Textarea
-            id="notes"
-            name="notes"
-            placeholder="Optional notes..."
-            rows={3}
-            className="resize-none"
-          />
-        </div>
-      </div>
-      <div className="flex justify-end border-t pt-4">
-        <Button type="submit" disabled={pending} className="h-10 gap-2">
-          {pending ? (
-            <FontAwesomeIcon
-              icon={faSpinner}
-              className="h-3.5 w-3.5 animate-spin"
-            />
-          ) : (
-            <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
-          )}
-          Add Transaction
-        </Button>
       </div>
     </form>
   );

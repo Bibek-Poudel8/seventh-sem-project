@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Minus, 
-  AlertCircle, 
-  Wand2, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  AlertCircle,
+  Wand2,
   BrainCircuit,
   ArrowUpRight,
   Target,
@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DonutChart } from "@/components/charts/DonutChart";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -141,12 +141,11 @@ export function AIInsightsClient() {
               <span className="text-xs text-muted-foreground mb-1">Based on history</span>
             </div>
             <div className="mt-3 w-full bg-muted rounded-full h-1.5">
-              <div 
-                className={`h-full rounded-full ${
-                  data.months_of_data > 3 ? "bg-emerald-500 w-full" : 
-                  data.months_of_data > 1 ? "bg-amber-500 w-2/3" : 
-                  "bg-orange-500 w-1/3"
-                }`} 
+              <div
+                className={`h-full rounded-full ${data.months_of_data > 3 ? "bg-primary w-full" :
+                  data.months_of_data > 1 ? "bg-amber-500 w-2/3" :
+                    "bg-orange-500 w-1/3"
+                  }`}
               />
             </div>
           </CardContent>
@@ -155,7 +154,7 @@ export function AIInsightsClient() {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Distribution Chart */}
-        <Card className="lg:col-span-2 shadow-sm">
+        <Card className="lg:col-span-2 shadow-sm h-fit">
           <CardHeader>
             <CardTitle className="text-lg">Spending Distribution</CardTitle>
             <CardDescription>Predicted breakdown by category</CardDescription>
@@ -171,7 +170,7 @@ export function AIInsightsClient() {
             <Target className="h-4 w-4" />
             Category Forecasts
           </h3>
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {data.predictions.map((p, i) => (
               <PredictionCard key={i} prediction={p} />
             ))}
@@ -189,36 +188,53 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
     stable: <Minus className="h-4 w-4 text-slate-400" />,
   };
 
-  const confidenceColor = {
-    low: "text-orange-500 bg-orange-500/10 border-orange-500/20",
-    medium: "text-amber-500 bg-amber-500/10 border-amber-500/20",
-    high: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20",
+  const confidenceStars: Record<string, number> = {
+    low: 1,
+    medium: 2,
+    high: 3,
   };
+
+  const starColor: Record<string, string> = {
+    low: "text-orange-400",
+    medium: "text-gray-400",
+    high: "text-primary",
+  };
+
+  function Stars({ count }: { count: number }) {
+    return (
+      <span className={`text-sm tracking-wider ${starColor[prediction.confidence]}`}>
+        {"★".repeat(count)}{"☆".repeat(3 - count)}
+      </span>
+    );
+  }
 
   return (
     <Card className="group hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden relative">
-      <div 
+      {/* <div
         className="absolute left-0 top-0 bottom-0 w-1 opacity-60 transition-all duration-300 group-hover:w-1.5"
         style={{ backgroundColor: CATEGORY_COLORS[prediction.category] || "#94a3b8" }}
-      />
-      <CardContent className="p-4 flex items-center justify-between">
+      /> */}
+      <CardContent className="p-4 flex flex-col gap-3">
         <div className="flex items-center gap-4">
-          <div 
-            className="h-10 w-10 rounded-xl flex items-center justify-center bg-muted"
+          <div
+            className="h-10 w-10 rounded-xl flex items-center justify-center bg-muted shrink-0"
             style={{ color: CATEGORY_COLORS[prediction.category] || "#94a3b8" }}
           >
             <BrainCircuit className="h-5 w-5" />
           </div>
-          <div>
-            <h4 className="font-semibold text-sm leading-none">{prediction.category}</h4>
+          <div className="min-w-0">
+            <h4 className="font-semibold text-sm leading-none truncate">{prediction.category}</h4>
             <div className="flex items-center gap-2 mt-1.5">
-              <Badge variant="outline" className={`text-[10px] py-0 px-1.5 h-4 font-normal ${confidenceColor[prediction.confidence]}`}>
-                {prediction.confidence.toUpperCase()} CONFIDENCE
-              </Badge>
+              <span className="flex items-center gap-1.5">
+                <Stars count={confidenceStars[prediction.confidence]} />
+                <span className={`text-[11px] font-semibold ${starColor[prediction.confidence]}`}>
+                  {prediction.confidence.charAt(0).toUpperCase() + prediction.confidence.slice(1)}
+                </span>
+              </span>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Info className="h-3 w-3 text-muted-foreground cursor-help" />
+                    <Info className="h-3 w-3 text-muted-foreground cursor-help shrink-0" />
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="text-xs">Method: {prediction.method}</p>
@@ -230,13 +246,15 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
           </div>
         </div>
 
-        <div className="text-right">
-          <p className="text-xs text-muted-foreground">Predicted Spend</p>
-          <div className="flex items-center justify-end gap-2 mt-0.5">
-            <span className="text-lg font-bold">NPR {prediction.predicted_amount.toLocaleString()}</span>
-            {trendIcon[prediction.trend]}
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <div>
+            <p className="text-xs text-muted-foreground">Predicted Spend</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="text-lg font-bold">NPR {prediction.predicted_amount.toLocaleString()}</span>
+              {trendIcon[prediction.trend]}
+            </div>
           </div>
-          <div className="text-[10px] text-muted-foreground mt-0.5">
+          <div className="text-right text-[10px] text-muted-foreground">
             Avg: NPR {prediction.avg_monthly.toLocaleString()} / mo
           </div>
         </div>

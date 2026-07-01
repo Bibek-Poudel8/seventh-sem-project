@@ -16,7 +16,7 @@ async function getAuthSession() {
 
 const ProfileSchema = z.object({
   name: z.string().min(2),
-  currency: z.string().length(3),
+  currency: z.string().min(3).max(3),
   timezone: z.string().min(1),
 });
 
@@ -50,14 +50,16 @@ export async function updateProfile(
   return { success: true };
 }
 
-const PasswordSchema = z.object({
-  currentPassword: z.string().min(1),
-  newPassword: z.string().min(8).regex(/[a-zA-Z]/).regex(/[0-9]/),
-  confirmPassword: z.string().min(1),
-}).refine((d) => d.newPassword === d.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const PasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(8).regex(/[a-zA-Z]/).regex(/[0-9]/),
+    confirmPassword: z.string().min(1),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export async function changePassword(
   state: { errors?: Record<string, string[]>; message?: string; success?: boolean } | undefined,
@@ -129,6 +131,56 @@ export async function updatePreferences(
       defaultTransactionType: validated.data.defaultTransactionType as TransactionType,
       notifyBudgetWarningPct: validated.data.notifyBudgetWarningPct,
     },
+  });
+
+  revalidatePath("/dashboard/settings");
+  return { success: true };
+}
+
+// Notification preferences stored as JSON in pushSubscription field
+// We use a namespaced key to differentiate from actual push subscription data
+export async function updateNotificationPreferences(
+  state: { success?: boolean } | undefined,
+  formData: FormData
+): Promise<{ success?: boolean }> {
+  const session = await getAuthSession();
+
+  const notifKeys = [
+    "budget_exceeded",
+    "budget_warning",
+    "weekly_summary",
+    "ai_insight",
+    "transaction_added",
+    "monthly_report",
+    "anomaly_detected",
+  ];
+
+  const prefs: Record<string, boolean> = {};
+  for (const key of notifKeys) {
+    prefs[key] = formData.get(key) === "on";
+  }
+
+  // Fetch existing profile to merge with any real push subscription data
+  const existing = await prisma.userProfile.findUnique({
+    where: { userId: session.user.id! },
+    select: { pushSubscription: true },
+  });
+
+  let existingData: Record<string, unknown> = {};
+  if (existing?.pushSubscription) {
+    try {
+      existingData = JSON.parse(existing.pushSubscription);
+    } catch {
+      // ignore invalid JSON
+    }
+  }
+
+  const merged = JSON.stringify({ ...existingData, notifPrefs: prefs });
+
+  await prisma.userProfile.upsert({
+    where: { userId: session.user.id! },
+    update: { pushSubscription: merged },
+    create: { userId: session.user.id!, pushSubscription: merged },
   });
 
   revalidatePath("/dashboard/settings");

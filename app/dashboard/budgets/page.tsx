@@ -7,12 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faArrowTrendUp,
   faChevronDown,
   faCirclePlus,
-  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
-import { CircularProgress } from "@/components/ui/CircularProgress";
+import { Progress } from "@/components/ui/progress";
 import BudgetActions from "./BudgetActions";
 
 function formatCurrency(amount: number, currency = "NPR") {
@@ -216,43 +214,40 @@ export default async function BudgetsPage() {
         </details>
       </div> */}
 
-      {/* Summary Bar */}
+      {/* Summary Cards */}
       {activeBudgets.length > 0 && (
-        <Card>
-          <CardContent className="p-5">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-1">
-                  Total Budgeted
-                </p>
-                <p className="text-lg font-bold">
-                  {formatCurrency(totalBudgeted, currency)}
-                </p>
-              </div>
-              <div className="text-center border-x">
-                <p className="text-xs text-muted-foreground mb-1">
-                  Total Spent
-                </p>
-                <p className="text-lg font-bold text-red-600 dark:text-red-400">
-                  {formatCurrency(totalSpent, currency)}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-1">Remaining</p>
-                <p
-                  className={cn(
-                    "text-lg font-bold",
-                    totalRemaining >= 0
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : "text-red-600 dark:text-red-400",
-                  )}
-                >
-                  {formatCurrency(totalRemaining, currency)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="bg-muted/30">
+            <CardContent className="p-5">
+              <p className="text-xs font-bold text-muted-foreground uppercase mb-1">
+                Total Budgeted
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {formatCurrency(totalBudgeted, currency)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-muted/30">
+            <CardContent className="p-5">
+              <p className="text-xs font-bold text-muted-foreground uppercase mb-1">
+                Total Spent
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {formatCurrency(totalSpent, currency)}
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-muted/30">
+            <CardContent className="p-5">
+              <p className="text-xs font-bold text-muted-foreground uppercase mb-1">
+                Remaining
+              </p>
+              <p className="text-2xl font-bold text-foreground">
+                {formatCurrency(totalRemaining, currency)}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Category-wise Budget Cards */}
@@ -278,7 +273,7 @@ export default async function BudgetsPage() {
               ) ?? categoryBudgets[0];
 
             return (
-              <Card key={category.id} className="relative overflow-hidden">
+              <Card key={category.id} className="relative overflow-hidden bg-muted/30">
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">
                     <div>
@@ -314,53 +309,55 @@ export default async function BudgetsPage() {
                   </div>
                 </CardHeader>
 
-                <CardContent className="flex flex-col items-center gap-4 ">
+                <CardContent className="space-y-2 pt-2">
                   {currentBudget ? (
-                    <>
-                      <CircularProgress
-                        percentage={currentBudget.percentUsed}
-                        size={130}
-                        centerLabel={`${formatCurrency(currentBudget.spent, currency)}`}
-                        centerSubLabel={`of ${formatCurrency(Number(currentBudget.amountLimit), currency)}`}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {formatCurrency(currentBudget.spent, currency)} of{" "}
+                          {formatCurrency(Number(currentBudget.amountLimit), currency)}
+                        </span>
+                        <span className="font-semibold tabular-nums">
+                          {Math.round(currentBudget.percentUsed)}%
+                        </span>
+                      </div>
+                      <Progress
+                        value={Math.min(currentBudget.percentUsed, 100)}
+                        indicatorClassName={cn(
+                          currentBudget.percentUsed >= 100 && "bg-red-500",
+                          currentBudget.percentUsed >= 90 && currentBudget.percentUsed < 100 && "bg-orange-500",
+                          currentBudget.percentUsed >= 75 && currentBudget.percentUsed < 90 && "bg-amber-500",
+                          currentBudget.percentUsed < 75 && "bg-emerald-500",
+                        )}
                       />
-
-                      <div className="w-full text-center space-y-2">
+                      <div className="flex items-center justify-between text-xs">
                         <p
                           className={cn(
-                            "text-sm font-semibold",
+                            "font-medium",
                             currentBudget.remaining < 0
                               ? "text-red-600 dark:text-red-400"
                               : "text-muted-foreground",
                           )}
                         >
                           {currentBudget.remaining < 0
-                            ? `${formatCurrency(Math.abs(currentBudget.remaining), currency)} over budget`
-                            : `${formatCurrency(currentBudget.remaining, currency)} remaining`}
+                            ? `${formatCurrency(Math.abs(currentBudget.remaining), currency)} over`
+                            : `${formatCurrency(currentBudget.remaining, currency)} left`}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground">
                           {categoryBudgets.length} budget
-                          {categoryBudgets.length !== 1 ? "s" : ""} available
+                          {categoryBudgets.length !== 1 ? "s" : ""}
                         </p>
                       </div>
-                    </>
+                    </div>
                   ) : (
-                    <div className="flex w-full flex-col items-center justify-center gap-4 py-4 text-center">
-                      <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center">
-                        <FontAwesomeIcon
-                          icon={faArrowTrendUp}
-                          className="h-7 w-7 text-muted-foreground"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-semibold">Empty budget</p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Add a budget for this category to begin tracking.
-                        </p>
-                      </div>
+                    <div className="flex items-center bg-primary/5 justify-between rounded-lg border border-dashed px-3 py-2.5">
+                      <p className="text-sm text-muted-foreground">
+                        No budget set for this category
+                      </p>
                       <BudgetActions
                         categories={categories}
                         mode="create"
-                        triggerLabel="Add budget"
+                        triggerLabel="Add"
                         dialogTitle={`Add Budget for ${category.name}`}
                         defaultCategoryId={category.id}
                         defaultPeriod="MONTHLY"

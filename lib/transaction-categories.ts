@@ -1,3 +1,4 @@
+import { icon } from "@fortawesome/fontawesome-svg-core";
 import { TransactionType } from "../generated/prisma/client";
 
 export const SYSTEM_TRANSACTION_CATEGORIES = [
@@ -67,10 +68,19 @@ export const SYSTEM_TRANSACTION_CATEGORIES = [
     icon: "circle-help",
     color: "#64748B",
   },
+  {
+    name: "Education",
+    type: TransactionType.EXPENSE,
+    icon: "user-graduate",
+    color: "#2563EB",
+  }
 ] as const;
 
 export function normalizeCategoryName(category: string) {
-  const trimmed = category.trim();
+  let trimmed = category.trim();
+  if (trimmed.toLowerCase() === "utilities & services") {
+    trimmed = "Utilities & Bills";
+  }
   return (
     SYSTEM_TRANSACTION_CATEGORIES.find(
       (item) => item.name.toLowerCase() === trimmed.toLowerCase(),
