@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import * as transactionService from "@/services/transaction.service";
@@ -154,8 +154,9 @@ export async function createTransaction(
     }
   }
 
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/transactions");
+  revalidateTag(`transactions-${session.user.id!}`, { expire: 0 });
+  // Budget spending totals are derived from transactions — bust those too
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
   return { success: true, transactionId: transaction.id };
 }
 
@@ -202,21 +203,21 @@ export async function updateTransaction(
     notes,
   });
 
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/transactions");
+  revalidateTag(`transactions-${session.user.id!}`, { expire: 0 });
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
   return { success: true };
 }
 
 export async function deleteTransaction(id: string): Promise<void> {
   const session = await getAuthSession();
   await transactionService.deleteTransaction(id, session.user.id!);
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/transactions");
+  revalidateTag(`transactions-${session.user.id!}`, { expire: 0 });
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
 }
 
 export async function bulkDeleteTransactions(ids: string[]): Promise<void> {
   const session = await getAuthSession();
   await transactionService.bulkDeleteTransactions(ids, session.user.id!);
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/transactions");
+  revalidateTag(`transactions-${session.user.id!}`, { expire: 0 });
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
 }

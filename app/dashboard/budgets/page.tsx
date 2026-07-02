@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { getAllUserBudgetsWithSpend } from "@/services/budget.service";
-import { prisma } from "@/prisma";
+import {
+  getCachedAllUserBudgetsWithSpend,
+  getCachedCategories,
+  getCachedUserProfile,
+} from "@/lib/query-cache";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,12 +60,9 @@ export default async function BudgetsPage() {
   const currentMonthStart = startOfMonth(now);
   const currentMonthEnd = endOfMonth(now);
   const [budgets, categories, profile] = await Promise.all([
-    getAllUserBudgetsWithSpend(userId),
-    prisma.category.findMany({
-      where: { OR: [{ userId }, { isSystem: true }], type: "EXPENSE" },
-      orderBy: { name: "asc" },
-    }),
-    prisma.userProfile.findUnique({ where: { userId } }),
+    getCachedAllUserBudgetsWithSpend(userId),
+    getCachedCategories(userId),
+    getCachedUserProfile(userId),
   ]);
 
   const currency = profile?.currency ?? "NPR";
