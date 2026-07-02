@@ -8,11 +8,15 @@ import {
   getCachedUserBudgets,
   getCachedUserProfile,
 } from "@/lib/query-cache";
+import Link from "next/link";
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import ChartsRow from "@/components/dashboard/ChartsRow";
 import BudgetsAndAI from "@/components/dashboard/BudgetsAndAI";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import DateRangePicker from "@/components/dashboard/DateRangePicker";
+import { Button } from "@/components/ui/button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 function getDateRange(range: string, from?: string, to?: string) {
   const now = new Date();
@@ -131,7 +135,14 @@ export default async function DashboardPage(props: {
             Monitor your financial health and spending patterns.
           </p>
         </div>
-        <DateRangePicker />
+        <div className="flex items-center gap-2">
+          <Button asChild size="sm" className="h-8 gap-1.5">
+            <Link href="/dashboard/transactions?add=true">
+              <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" /> Add Transaction
+            </Link>
+          </Button>
+          <DateRangePicker />
+        </div>
       </div>
 
       <SummaryCards

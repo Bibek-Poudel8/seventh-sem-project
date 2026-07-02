@@ -52,6 +52,7 @@ export default function TransactionForm({
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrWarning, setOcrWarning] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [billImagePreview, setBillImagePreview] = useState<string | null>(null);
 
   const amountRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -229,7 +230,20 @@ export default function TransactionForm({
   const handleBillUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setBillImagePreview(URL.createObjectURL(file));
     void processBillFile(file);
+  };
+
+  const clearBillImage = () => {
+    if (billImagePreview) {
+      URL.revokeObjectURL(billImagePreview);
+    }
+    setBillImagePreview(null);
+    setOcrWarning("");
+    setOcrLoading(false);
+    if (billFileInputRef.current) {
+      billFileInputRef.current.value = "";
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -250,6 +264,7 @@ export default function TransactionForm({
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
+    setBillImagePreview(URL.createObjectURL(file));
     void processBillFile(file);
   };
 
@@ -303,10 +318,12 @@ export default function TransactionForm({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={() => billFileInputRef.current?.click()}
-            className={`flex flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed p-4 transition-colors text-center cursor-pointer min-h-[140px] md:h-full md:min-h-[220px] ${isDragging
+            onClick={() => !billImagePreview && billFileInputRef.current?.click()}
+            className={`relative flex flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed p-4 transition-colors text-center min-h-[140px] md:h-full md:min-h-[220px] overflow-hidden ${isDragging
               ? "border-primary bg-primary/10"
-              : "border-muted-foreground/30 bg-muted/30 hover:bg-muted/50"
+              : billImagePreview
+                ? "border-muted-foreground/30 bg-muted/30"
+                : "border-muted-foreground/30 bg-muted/30 hover:bg-muted/50 cursor-pointer"
               }`}
           >
             <input
@@ -318,23 +335,50 @@ export default function TransactionForm({
               className="hidden"
               id="bill-upload-input"
             />
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="rounded-full bg-primary/10 p-2.5 text-primary">
-                {ocrLoading ? (
-                  <FontAwesomeIcon icon={faSpinner} className="h-4.5 w-4.5 animate-spin" />
-                ) : (
-                  <FontAwesomeIcon icon={faCamera} className="h-4.5 w-4.5" />
+            {billImagePreview ? (
+              <>
+                <img
+                  src={billImagePreview}
+                  alt="Bill preview"
+                  className="absolute inset-0 h-full w-full object-contain rounded-lg"
+                />
+                {ocrLoading && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-lg bg-black/50">
+                    <FontAwesomeIcon icon={faSpinner} className="h-6 w-6 animate-spin text-white" />
+                    <p className="text-xs font-medium text-white">Reading bill...</p>
+                  </div>
                 )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearBillImage();
+                  }}
+                  className="absolute top-1.5 right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-white text-xs hover:bg-black/70 transition-colors"
+                  aria-label="Remove bill image"
+                >
+                  ✕
+                </button>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-1.5">
+                <div className="rounded-full bg-primary/10 p-2.5 text-primary">
+                  {ocrLoading ? (
+                    <FontAwesomeIcon icon={faSpinner} className="h-4.5 w-4.5 animate-spin" />
+                  ) : (
+                    <FontAwesomeIcon icon={faCamera} className="h-4.5 w-4.5" />
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs font-medium">
+                    {ocrLoading ? "Reading bill..." : "Scan or upload bill"}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Drag & drop or click
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-medium">
-                  {ocrLoading ? "Reading bill..." : "Scan or upload bill"}
-                </p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">
-                  Drag & drop or click
-                </p>
-              </div>
-            </div>
+            )}
           </div>
           {ocrWarning && (
             <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">

@@ -13,7 +13,7 @@ export default function ChartsRow({
 }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card>
+      <Card className="bg-muted/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold">
             Spending by Category
@@ -24,7 +24,7 @@ export default function ChartsRow({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="bg-muted/30">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold">Monthly Trend</CardTitle>
         </CardHeader>

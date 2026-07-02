@@ -30,7 +30,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
           </ThemeProvider>
         </QueryProvider>
       </body>
