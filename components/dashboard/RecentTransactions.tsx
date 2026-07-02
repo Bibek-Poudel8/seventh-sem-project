@@ -14,7 +14,7 @@ export default function RecentTransactions({
   currency: string;
 }) {
   return (
-    <Card>
+    <Card className="bg-muted/30">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-semibold">
           Recent Transactions

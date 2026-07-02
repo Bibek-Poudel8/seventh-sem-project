@@ -10,18 +10,13 @@ import {
   Tag, 
   CircleDollarSign,
   Info,
-  ChevronRight
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface Anomaly {
   id: string;
@@ -47,6 +42,12 @@ export function AnomalyClient() {
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showOlder, setShowOlder] = useState(false);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayAnomalies = anomalies.filter(a => new Date(a.createdAt) >= today);
+  const olderAnomalies = anomalies.filter(a => new Date(a.createdAt) < today);
 
   const fetchAnomalies = async () => {
     try {
@@ -138,9 +139,38 @@ export function AnomalyClient() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {anomalies.map((anomaly) => (
-            <AnomalyCard key={anomaly.id} anomaly={anomaly} />
-          ))}
+          {todayAnomalies.length > 0 && (
+            <div className="grid grid-cols-1 gap-2">
+              {todayAnomalies.map((anomaly) => (
+                <AnomalyCard key={anomaly.id} anomaly={anomaly} />
+              ))}
+            </div>
+          )}
+
+          {olderAnomalies.length > 0 && (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-muted-foreground hover:text-foreground border border-dashed border-muted-foreground/30"
+                onClick={() => setShowOlder(!showOlder)}
+              >
+                {showOlder ? (
+                  <>Hide Older Anomalies ({olderAnomalies.length}) <ChevronUp className="ml-1 h-4 w-4" /></>
+                ) : (
+                  <>Show Older Anomalies ({olderAnomalies.length}) <ChevronDown className="ml-1 h-4 w-4" /></>
+                )}
+              </Button>
+
+              {showOlder && (
+                <div className="grid grid-cols-1 gap-2">
+                  {olderAnomalies.map((anomaly) => (
+                    <AnomalyCard key={anomaly.id} anomaly={anomaly} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -148,6 +178,8 @@ export function AnomalyClient() {
 }
 
 function AnomalyCard({ anomaly }: { anomaly: Anomaly }) {
+  const [expanded, setExpanded] = useState(false);
+
   const getScoreBadge = (score: number) => {
     if (score >= 0.8) return <Badge className="bg-red-500 hover:bg-red-600 border-none">High Risk</Badge>;
     if (score >= 0.5) return <Badge className="bg-amber-500 hover:bg-amber-600 border-none">Moderate</Badge>;
@@ -157,102 +189,98 @@ function AnomalyCard({ anomaly }: { anomaly: Anomaly }) {
   const transaction = anomaly.transaction;
 
   return (
-    <Card className="group hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden">
+    <Card className="transition-all duration-300 shadow-sm hover:shadow-md overflow-hidden">
       <CardContent className="p-0">
-        <div className="flex flex-col md:flex-row">
-          {/* Left indicator bar */}
-          <div 
-            className={`w-full md:w-1.5 h-1.5 md:h-auto ${
-              anomaly.score >= 0.8 ? 'bg-red-500' : 
-              anomaly.score >= 0.5 ? 'bg-amber-500' : 
-              'bg-blue-500'
-            }`} 
-          />
-          
-          <div className="flex-1 p-6">
-            <div className="flex flex-col md:flex-row justify-between gap-4">
-              <div className="space-y-4 flex-1">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                    <AlertTriangle className={`h-5 w-5 ${
-                      anomaly.score >= 0.8 ? 'text-red-500' : 
-                      anomaly.score >= 0.5 ? 'text-amber-500' : 
-                      'text-blue-500'
-                    }`} />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-lg leading-none">Potential Anomaly Detected</h4>
-                      {getScoreBadge(anomaly.score)}
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Detected on {new Date(anomaly.createdAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-muted/40 rounded-xl p-4 border border-muted">
-                  <div className="flex items-start gap-2">
-                    <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                    <p className="text-sm leading-relaxed">{anomaly.reason}</p>
-                  </div>
-                </div>
-              </div>
-
-              {transaction && (
-                <div className="md:w-72 space-y-3">
-                  <div className="p-4 rounded-xl border border-muted bg-card shadow-sm">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Transaction Details</span>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-bold text-base">NPR {parseFloat(transaction.amount).toLocaleString()}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        <span>{new Date(transaction.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      </div>
-
-                      {transaction.category && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Tag className="h-4 w-4" />
-                          <Badge 
-                            variant="secondary" 
-                            className="text-[10px] h-4 px-1.5 font-normal"
-                            style={{ 
-                              backgroundColor: transaction.category.color + '20',
-                              color: transaction.category.color || undefined,
-                              borderColor: transaction.category.color + '40'
-                            }}
-                          >
-                            {transaction.category.name}
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {transaction.description && (
-                      <p className="text-xs text-muted-foreground mt-3 italic line-clamp-1">
-                        "{transaction.description}"
-                      </p>
-                    )}
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="w-full text-xs" onClick={() => window.location.href = '/dashboard/transactions'}>
-                      View in Transactions
-                    </Button>
-                  </div>
-                </div>
-              )}
+        <div
+          className="flex items-center justify-between p-4 cursor-pointer select-none gap-3"
+          onClick={() => setExpanded(!expanded)}
+        >
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+              anomaly.score >= 0.8 ? 'bg-red-100' :
+              anomaly.score >= 0.5 ? 'bg-amber-100' :
+              'bg-blue-100'
+            }`}>
+              <AlertTriangle className={`h-4 w-4 ${
+                anomaly.score >= 0.8 ? 'text-red-500' :
+                anomaly.score >= 0.5 ? 'text-amber-500' :
+                'text-blue-500'
+              }`} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm truncate">{anomaly.reason}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {new Date(anomaly.createdAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}
+              </p>
             </div>
           </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {getScoreBadge(anomaly.score)}
+            {expanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+          </div>
         </div>
+
+        {expanded && (
+          <div className="border-t border-muted p-4 space-y-4">
+            <div className="bg-muted/40 rounded-xl p-4 border border-muted">
+              <div className="flex items-start gap-2">
+                <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-sm leading-relaxed">{anomaly.reason}</p>
+              </div>
+            </div>
+
+            {transaction ? (
+              <div>
+                <div className="p-4 rounded-xl border border-muted bg-card shadow-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Transaction Details</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <CircleDollarSign className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-bold text-base">NPR {parseFloat(transaction.amount).toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      <span>{new Date(transaction.date).toLocaleDateString("en-US", { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    </div>
+
+                    {transaction.category && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Tag className="h-4 w-4" />
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] h-4 px-1.5 font-normal"
+                          style={{
+                            backgroundColor: transaction.category.color + '20',
+                            color: transaction.category.color || undefined,
+                            borderColor: transaction.category.color + '40'
+                          }}
+                        >
+                          {transaction.category.name}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+
+                  {transaction.description && (
+                    <p className="text-xs text-muted-foreground mt-3 italic">
+                      &quot;{transaction.description}&quot;
+                    </p>
+                  )}
+                </div>
+
+                <Button variant="outline" size="sm" className="w-full text-xs mt-3" onClick={() => window.location.href = '/dashboard/transactions'}>
+                  View in Transactions
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-2">No transaction details available.</p>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -268,9 +296,9 @@ function LoadingSkeleton() {
         </div>
         <Skeleton className="h-10 w-40" />
       </div>
-      <div className="space-y-4">
+      <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-48 w-full rounded-2xl" />
+          <Skeleton key={i} className="h-16 w-full rounded-xl" />
         ))}
       </div>
     </div>

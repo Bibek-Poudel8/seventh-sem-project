@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,7 +40,21 @@ export default function TransactionToolbar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [addOpen, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(searchParams.add === "true");
+
+  useEffect(() => {
+    if (searchParams.add === "true") {
+      const params = new URLSearchParams(
+        Object.entries(searchParams).filter(([, v]) => v != null) as [
+          string,
+          string,
+        ][],
+      );
+      params.delete("add");
+      params.delete("page");
+      router.replace(`${pathname}?${params.toString()}`);
+    }
+  }, []);
 
   const updateParam = (key: string, value: string | null) => {
     const params = new URLSearchParams(

@@ -369,7 +369,7 @@ export default async function BudgetsPage() {
                 </CardContent>
 
                 {/* Color accent bar */}
-                <div
+                {/* <div
                   className={cn(
                     "absolute bottom-0 left-0 h-0.5 w-full transition-all",
                     currentBudget
@@ -385,7 +385,7 @@ export default async function BudgetsPage() {
                   style={{
                     width: `${Math.min(currentBudget?.percentUsed ?? 0, 100)}%`,
                   }}
-                />
+                /> */}
               </Card>
             );
           })}
