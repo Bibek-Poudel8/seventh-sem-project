@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useActionState } from "react";
 import { login, AuthState } from "@/app/actions/auth.actions";
@@ -21,9 +22,9 @@ function LoginForm() {
   const registered = searchParams.get("registered");
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div className="min-h-screen h-screen flex bg-white">
       {/* ── LEFT PANEL ── */}
-      <div className="flex flex-1 flex-col justify-between px-12 py-10 lg:px-20 lg:py-14 max-w-xl">
+      <div className="flex flex-1 flex-col justify-between px-12 py-10 lg:px-20 lg:py-14 max-w-xl max-h-screen">
         {/* Logo */}
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-md bg-violet-600 flex items-center justify-center">
@@ -40,7 +41,7 @@ function LoginForm() {
             className="text-5xl font-extrabold leading-tight text-gray-900"
             style={{ fontFamily: "'Georgia', serif", letterSpacing: "-0.02em" }}
           >
-            Holla,
+            Hello,
             <br />
             Welcome Back
           </h1>
@@ -188,7 +189,15 @@ function LoginForm() {
       </div>
 
       {/* ── RIGHT PANEL ── */}
-      <div className="bg-purple-500 flex-1"></div>
+      <div className="bg-purple-500 flex-1 flex items-center justify-center p-10">
+        <Image
+          src="/loginscreen.svg"
+          alt="Login screen illustration"
+          width={500}
+          height={500}
+          className="w-full object-contain"
+        />
+      </div>
     </div>
   );
 }

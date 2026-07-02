@@ -36,7 +36,7 @@ export default function SummaryCards({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {/* Net */}
-      <Card>
+      <Card className="bg-muted/30">
         <CardContent className="p-4 flex items-center justify-between">
           <div>
             <div className="text-xs text-muted-foreground uppercase font-semibold">
@@ -67,7 +67,7 @@ export default function SummaryCards({
       </Card>
 
       {/* Income */}
-      <Card>
+      <Card className="bg-muted/30">
         <CardContent className="p-4 flex items-center justify-between">
           <div>
             <div className="text-xs text-muted-foreground uppercase font-semibold">
@@ -88,7 +88,7 @@ export default function SummaryCards({
       </Card>
 
       {/* Expenses */}
-      <Card>
+      <Card className="bg-muted/30">
         <CardContent className="p-4 flex items-center justify-between">
           <div>
             <div className="text-xs text-muted-foreground uppercase font-semibold">
