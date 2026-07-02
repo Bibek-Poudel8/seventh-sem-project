@@ -1,8 +1,13 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import * as analyticsService from "@/services/analytics.service";
-import * as budgetService from "@/services/budget.service";
-import { prisma } from "@/prisma";
+import {
+  getCachedPeriodSummary,
+  getCachedCategoryBreakdown,
+  getCachedMonthlyTrend,
+  getCachedRecentTransactions,
+  getCachedUserBudgets,
+  getCachedUserProfile,
+} from "@/lib/query-cache";
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import ChartsRow from "@/components/dashboard/ChartsRow";
 import BudgetsAndAI from "@/components/dashboard/BudgetsAndAI";
@@ -86,7 +91,6 @@ export default async function DashboardPage(props: {
 
   const { start, end } = getDateRange(range, from, to);
 
-  // Parallel server-side fetches
   const [
     summary,
     categoryBreakdown,
@@ -95,12 +99,12 @@ export default async function DashboardPage(props: {
     budgets,
     profile,
   ] = await Promise.all([
-    analyticsService.getPeriodSummary(userId, start, end),
-    analyticsService.getCategoryBreakdown(userId, start, end),
-    analyticsService.getMonthlyTrend(userId, 6),
-    analyticsService.getRecentTransactions(userId, 5, start, end),
-    budgetService.getUserBudgets(userId),
-    prisma.userProfile.findUnique({ where: { userId } }),
+    getCachedPeriodSummary(userId, start, end),
+    getCachedCategoryBreakdown(userId, start, end),
+    getCachedMonthlyTrend(userId, 6),
+    getCachedRecentTransactions(userId, 5, start, end),
+    getCachedUserBudgets(userId),
+    getCachedUserProfile(userId),
   ]);
 
   const currency = profile?.currency ?? "NPR";

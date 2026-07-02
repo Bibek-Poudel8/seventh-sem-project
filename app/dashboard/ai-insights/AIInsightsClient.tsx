@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   TrendingUp,
   TrendingDown,
@@ -54,31 +54,34 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Uncategorized": "#64748b", // slate-500
 };
 
+// Query function — separated so it can be typed cleanly
+async function fetchAIInsights(): Promise<PredictionResponse> {
+  const res = await fetch("/api/ai/predict");
+  if (!res.ok) throw new Error("Failed to fetch AI insights");
+  return res.json();
+}
+
 export function AIInsightsClient() {
-  const [data, setData] = useState<PredictionResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<PredictionResponse, Error>({
+    queryKey: ["ai-insights"],
+    queryFn: fetchAIInsights,
+    // AI predictions are expensive — treat data as fresh for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    // Retry once before surfacing the error state
+    retry: 1,
+  });
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const res = await fetch("/api/ai/predict");
-        if (!res.ok) throw new Error("Failed to fetch AI insights");
-        const json = await res.json();
-        setData(json);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+  if (isLoading) return <LoadingSkeleton />;
 
-  if (loading) return <LoadingSkeleton />;
+  const errorMessage = isError ? (error?.message ?? "Something went wrong") : null;
 
-  if (error || !data || data.predictions.length === 0) {
+  if (errorMessage || !data || data.predictions.length === 0) {
     return (
       <Card className="bg-gradient-to-br from-destructive/5 to-destructive/10 border-destructive/20">
         <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
@@ -86,12 +89,12 @@ export function AIInsightsClient() {
             <AlertCircle className="h-6 w-6 text-destructive" />
           </div>
           <div className="text-center">
-            <p className="font-semibold">{error || "No Data Available"}</p>
+            <p className="font-semibold">{errorMessage || "No Data Available"}</p>
             <p className="text-sm text-muted-foreground mt-1">
-              {error ? "Please ensure the ML service is running." : "Try adding more transactions to see AI-powered predictions."}
+              {errorMessage ? "Please ensure the ML service is running." : "Try adding more transactions to see AI-powered predictions."}
             </p>
           </div>
-          <Button variant="outline" onClick={() => window.location.reload()}>Retry</Button>
+          <Button variant="outline" onClick={() => refetch()}>Retry</Button>
         </CardContent>
       </Card>
     );

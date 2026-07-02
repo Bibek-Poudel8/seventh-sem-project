@@ -1,8 +1,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import Link from "next/link";
-import { getUserTransactions } from "@/services/transaction.service";
-import { prisma } from "@/prisma";
+import {
+  getCachedUserTransactions,
+  getCachedCategories,
+  getCachedUserProfile,
+} from "@/lib/query-cache";
 import { cn } from "@/lib/utils";
 import TransactionTable from "./TransactionTable";
 import TransactionsCsvActions from "./TransactionsCsvActions";
@@ -41,7 +44,7 @@ export default async function TransactionsPage({
   const userId = session.user.id;
 
   const [{ transactions, total }, categories, profile] = await Promise.all([
-    getUserTransactions(userId, {
+    getCachedUserTransactions(userId, {
       category: params.category,
       type: params.type as "INCOME" | "EXPENSE" | undefined,
       dateFrom: params.dateFrom,
@@ -53,11 +56,8 @@ export default async function TransactionsPage({
       sortBy: params.sortBy ?? "date",
       sortOrder: (params.sortOrder as "asc" | "desc") ?? "desc",
     }),
-    prisma.category.findMany({
-      where: { OR: [{ userId }, { isSystem: true }] },
-      orderBy: { name: "asc" },
-    }),
-    prisma.userProfile.findUnique({ where: { userId } }),
+    getCachedCategories(userId),
+    getCachedUserProfile(userId),
   ]);
 
   const currency = profile?.currency ?? "NPR";

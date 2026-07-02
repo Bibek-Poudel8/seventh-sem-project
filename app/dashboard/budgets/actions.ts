@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import * as budgetService from "@/services/budget.service";
@@ -57,8 +57,7 @@ export async function createBudget(
     endDate: endDate ? new Date(endDate) : undefined,
   });
 
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/budgets");
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
   return { success: true };
 }
 
@@ -92,14 +91,12 @@ export async function updateBudget(
     endDate: endDate ? new Date(endDate) : null,
   });
 
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/budgets");
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
   return { success: true };
 }
 
 export async function deleteBudget(id: string): Promise<void> {
   const session = await getAuthSession();
   await budgetService.deleteBudget(id, session.user.id!);
-  revalidatePath("/dashboard");
-  revalidatePath("/dashboard/budgets");
+  revalidateTag(`budgets-${session.user.id!}`, { expire: 0 });
 }
