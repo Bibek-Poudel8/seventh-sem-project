@@ -38,7 +38,7 @@ export function getCachedPeriodSummary(userId: string, start: Date, end: Date) {
   return unstable_cache(
     () => analyticsService.getPeriodSummary(userId, start, end),
     [
-      "period-summary",
+      "period-summary-v3",
       userId,
       start.toISOString(),
       end.toISOString(),
@@ -201,16 +201,25 @@ export async function getCachedCategories(userId: string) {
     () =>
       prisma.category.findMany({
         where: { OR: [{ userId }, { isSystem: true }] },
-        orderBy: { name: "asc" },
+        orderBy: [{ name: "asc" }, { isSystem: "asc" }],
       }),
-    ["categories", userId],
+    ["categories-v2", userId],
     {
       revalidate: REVALIDATE_SECONDS,
       tags: [tags.categories(userId)],
     },
   )();
 
-  return result.map((c: any) => ({
+  const dedupedByName = new Map<string, any>();
+
+  for (const category of result) {
+    const key = category.name.trim().toLowerCase();
+    if (!dedupedByName.has(key)) {
+      dedupedByName.set(key, category);
+    }
+  }
+
+  return Array.from(dedupedByName.values()).map((c: any) => ({
     ...c,
     createdAt: new Date(c.createdAt),
     updatedAt: new Date(c.updatedAt),

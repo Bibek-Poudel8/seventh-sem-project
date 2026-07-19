@@ -16,6 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DonutChart } from "@/components/charts/DonutChart";
+import { getCategoryColor } from "@/lib/category-colors";
+import { getConfidenceColor, INACTIVE_CONFIDENCE_COLOR } from "@/lib/confidence-colors";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -41,18 +43,7 @@ interface PredictionResponse {
   message: string;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  "Shopping & Retail": "#ec4899", // pink-500
-  "Entertainment & Recreation": "#8b5cf6", // violet-500
-  "Utilities & Bills": "#3b82f6", // blue-500
-  "Miscellaneous": "#94a3b8", // slate-400
-  "Food & Dining": "#f59e0b", // amber-500
-  "Transport": "#10b981", // emerald-500
-  "Health & Wellness": "#ef4444", // red-500
-  "Education": "#6366f1", // indigo-500
-  "Investment": "#22c55e", // green-500
-  "Uncategorized": "#64748b", // slate-500
-};
+// use centralized category color mapping from `lib/category-colors`
 
 // Query function — separated so it can be typed cleanly
 async function fetchAIInsights(): Promise<PredictionResponse> {
@@ -103,7 +94,7 @@ export function AIInsightsClient() {
   const chartData = data.predictions.map((p) => ({
     category: p.category,
     amount: p.predicted_amount,
-    color: CATEGORY_COLORS[p.category] || "#94a3b8",
+    color: getCategoryColor(p.category) || "#94a3b8",
     percentage: Math.round((p.predicted_amount / data.total_predicted) * 100),
   }));
 
@@ -197,16 +188,13 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
     high: 3,
   };
 
-  const starColor: Record<string, string> = {
-    low: "text-orange-400",
-    medium: "text-gray-400",
-    high: "text-primary",
-  };
-
   function Stars({ count }: { count: number }) {
+    const activeColor = getConfidenceColor(prediction.confidence);
+    const inactiveColor = INACTIVE_CONFIDENCE_COLOR;
     return (
-      <span className={`text-sm tracking-wider ${starColor[prediction.confidence]}`}>
-        {"★".repeat(count)}{"☆".repeat(3 - count)}
+      <span className={`text-sm tracking-wider`}>
+        <span style={{ color: activeColor }}>{"★".repeat(count)}</span>
+        <span style={{ color: inactiveColor }}>{"☆".repeat(3 - count)}</span>
       </span>
     );
   }
@@ -217,11 +205,15 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
         className="absolute left-0 top-0 bottom-0 w-1 opacity-60 transition-all duration-300 group-hover:w-1.5"
         style={{ backgroundColor: CATEGORY_COLORS[prediction.category] || "#94a3b8" }}
       /> */}
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1 opacity-60 transition-all duration-300 group-hover:w-1.5"
+          style={{ backgroundColor: getCategoryColor(prediction.category) || "#94a3b8" }}
+        />
       <CardContent className="p-4 flex flex-col gap-3">
         <div className="flex items-center gap-4">
           <div
             className="h-10 w-10 rounded-xl flex items-center justify-center bg-muted shrink-0"
-            style={{ color: CATEGORY_COLORS[prediction.category] || "#94a3b8" }}
+              style={{ color: getCategoryColor(prediction.category) || "#94a3b8" }}
           >
             <BrainCircuit className="h-5 w-5" />
           </div>
@@ -230,7 +222,10 @@ function PredictionCard({ prediction }: { prediction: Prediction }) {
             <div className="flex items-center gap-2 mt-1.5">
               <span className="flex items-center gap-1.5">
                 <Stars count={confidenceStars[prediction.confidence]} />
-                <span className={`text-[11px] font-semibold ${starColor[prediction.confidence]}`}>
+                <span
+                  className={`text-[11px] font-semibold`}
+                  style={{ color: getConfidenceColor(prediction.confidence) }}
+                >
                   {prediction.confidence.charAt(0).toUpperCase() + prediction.confidence.slice(1)}
                 </span>
               </span>

@@ -1,4 +1,5 @@
 import { prisma } from "@/prisma";
+import { getCategoryColor } from "@/lib/category-colors";
 
 export async function getPeriodSummary(userId: string, start: Date, end: Date) {
   // Calculate duration to determine previous period for comparison
@@ -31,22 +32,37 @@ export async function getPeriodSummary(userId: string, start: Date, end: Date) {
   const prevIncome = Number(prevIncomeResult._sum.amount ?? 0);
   const prevExpenses = Number(prevExpenseResult._sum.amount ?? 0);
   const netBalance = totalIncome - totalExpenses;
+  const prevNet = prevIncome - prevExpenses;
   const savingsRate = totalIncome > 0 ? ((netBalance / totalIncome) * 100) : 0;
 
-  const incomeDelta = prevIncome > 0
-    ? Math.round(((totalIncome - prevIncome) / prevIncome) * 100)
-    : 0;
-  const expenseDelta = prevExpenses > 0
-    ? Math.round(((totalExpenses - prevExpenses) / prevExpenses) * 100)
-    : 0;
+  // Deltas: return 100 or -100 for zero-to-non-zero transitions so UI can show a percentage
+  const incomeDelta = prevIncome === 0 
+    ? (totalIncome === 0 ? 0 : 100)
+    : Math.round(((totalIncome - prevIncome) / Math.abs(prevIncome)) * 100);
+
+  const expenseDelta = prevExpenses === 0
+    ? (totalExpenses === 0 ? 0 : 100)
+    : Math.round(((totalExpenses - prevExpenses) / Math.abs(prevExpenses)) * 100);
+
+  const netDelta = prevNet === 0
+    ? (netBalance === 0 ? 0 : (netBalance > 0 ? 100 : -100))
+    : Math.round(((netBalance - prevNet) / Math.abs(prevNet)) * 100);
 
   return {
     totalIncome,
     totalExpenses,
     netBalance,
     savingsRate: Math.round(savingsRate * 10) / 10,
-    incomeDelta,
-    expenseDelta,
+    // Legacy fields kept non-null for SummaryCards backward compat
+    incomeDelta: incomeDelta ?? 0,
+    expenseDelta: expenseDelta ?? 0,
+    // Nullable deltas for Monthly Summary — null = "no prior data"
+    incomeDeltaNullable: incomeDelta,
+    expenseDeltaNullable: expenseDelta,
+    netDeltaNullable: netDelta,
+    prevIncome,
+    prevExpenses,
+    prevNet,
   };
 }
 
@@ -64,9 +80,9 @@ export async function getCategoryBreakdown(userId: string, start: Date, end: Dat
   const categoryMap = new Map<string, { category: string; amount: number; color: string; icon: string }>();
 
   for (const tx of transactions) {
-    const key = tx.categoryId ?? "uncategorized";
+    const key = tx.category?.name?.toLowerCase().trim() ?? "uncategorized";
     const category = tx.category?.name ?? "Uncategorized";
-    const color = tx.category?.color ?? "#6B7280";
+    const color = getCategoryColor(tx.category?.name, tx.category?.color);
     const icon = tx.category?.icon ?? "circle";
     const existing = categoryMap.get(key);
     if (existing) {

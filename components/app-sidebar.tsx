@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowTrendUp } from '@fortawesome/free-solid-svg-icons';
+
 import {
   faGauge,
   faArrowRightArrowLeft,
@@ -160,14 +162,14 @@ export function AppSidebar({ user }: AppSidebarProps) {
               tooltip="FinanceAI"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shrink-0">
-                <FontAwesomeIcon icon={faGem} className="size-4" />
-              </div>
+  <FontAwesomeIcon icon={faArrowTrendUp} className="size-4" />
+</div>
               <div className="flex flex-col gap-0.5 leading-none">
                 <span className="font-semibold text-sm tracking-tight">
                   FinanceAI
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                  Personal Finance
+                  Personal Finance Assistant
                 </span>
               </div>
             </SidebarMenuButton>

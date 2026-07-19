@@ -19,7 +19,7 @@ export default function DeltaBadge({ delta }: { delta: number }) {
       ) : (
         <FontAwesomeIcon icon={faArrowTrendDown} className="h-3 w-3" />
       )}
-      {Math.abs(delta)}% from last month
+      {Math.abs(delta)}%
     </span>
   );
 }

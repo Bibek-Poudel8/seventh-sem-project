@@ -37,6 +37,8 @@ interface Anomaly {
   } | null;
 }
 
+import { getCategoryColor } from "@/lib/category-colors";
+
 export function AnomalyClient() {
   const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
   const [loading, setLoading] = useState(true);
@@ -254,9 +256,9 @@ function AnomalyCard({ anomaly }: { anomaly: Anomaly }) {
                           variant="secondary"
                           className="text-[10px] h-4 px-1.5 font-normal"
                           style={{
-                            backgroundColor: transaction.category.color + '20',
-                            color: transaction.category.color || undefined,
-                            borderColor: transaction.category.color + '40'
+                            backgroundColor: getCategoryColor(transaction.category.name, transaction.category.color) + '20',
+                            color: getCategoryColor(transaction.category.name, transaction.category.color) || undefined,
+                            borderColor: getCategoryColor(transaction.category.name, transaction.category.color) + '40'
                           }}
                         >
                           {transaction.category.name}

@@ -26,12 +26,7 @@ export default function SummaryCards({
   const expenseSeries = (monthlyTrend ?? []).map((m) => m.expenses);
   const netSeries = (monthlyTrend ?? []).map((m) => m.net);
 
-  const netDelta = (() => {
-    if (netSeries.length < 2) return 0;
-    const last = netSeries[netSeries.length - 1];
-    const prev = netSeries[netSeries.length - 2] || 0;
-    return prev > 0 ? Math.round(((last - prev) / prev) * 100) : 0;
-  })();
+  const netDelta = summary.netDeltaNullable ?? 0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

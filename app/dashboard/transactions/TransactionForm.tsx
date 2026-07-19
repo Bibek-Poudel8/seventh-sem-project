@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCamera,
   faCircleInfo,
+  faFilePdf,
   faMagic,
   faPlus,
   faSpinner,
@@ -45,14 +46,11 @@ export default function TransactionForm({
   const [aiMessage, setAiMessage] = useState("");
   const [aiCategoryRaw, setAiCategoryRaw] = useState("");
   const [aiConfidenceScore, setAiConfidenceScore] = useState("");
-
-  // OCR-specific state. Separate from aiMessage so a low-confidence OCR
-  // warning doesn't get silently cleared the next time the category
-  // Select's onValueChange resets aiMessage.
   const [ocrLoading, setOcrLoading] = useState(false);
   const [ocrWarning, setOcrWarning] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [billImagePreview, setBillImagePreview] = useState<string | null>(null);
+  const [uploadedFileType, setUploadedFileType] = useState<string | null>(null);
 
   const amountRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -142,7 +140,6 @@ export default function TransactionForm({
     }
   };
 
-  // Run auto-categorization when description changes (debounced)
   useEffect(() => {
     const trimmed = description.trim();
     if (!trimmed) {
@@ -158,11 +155,6 @@ export default function TransactionForm({
     };
   }, [description]);
 
-  // Mirrors handleAutoCategorize's structure closely: same hidden-input
-  // population (aiCategoryRaw, aiConfidenceScore), same findCategoryByName
-  // lookup, same aiMessage feedback line. The difference is OCR also
-  // fills description/amount/date via refs since those are uncontrolled
-  // inputs in this form (no value= prop, just defaultValue on date).
   const processBillFile = async (file: File) => {
     setOcrLoading(true);
     setOcrWarning("");
@@ -205,16 +197,14 @@ export default function TransactionForm({
         }
       }
 
-      // Surface a warning if OCR text quality or category confidence was
-      // low, so the user double-checks the pre-filled fields before
-      // submitting — same instinct as the existing "Cant help with that"
-      // message, but specific to OCR since two models are now chained.
       if (data.ocr_low_confidence) {
         setOcrWarning(
           "Bill photo was hard to read — please verify the amount and date."
         );
       } else if (data.amount === null) {
-        setOcrWarning("Couldn't find an amount on the bill — please enter it manually.");
+        setOcrWarning(
+          "Couldn't find an amount on the bill — please enter it manually."
+        );
       }
     } catch (error) {
       console.error("OCR error:", error);
@@ -230,6 +220,7 @@ export default function TransactionForm({
   const handleBillUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setUploadedFileType(file.type);
     setBillImagePreview(URL.createObjectURL(file));
     void processBillFile(file);
   };
@@ -239,6 +230,7 @@ export default function TransactionForm({
       URL.revokeObjectURL(billImagePreview);
     }
     setBillImagePreview(null);
+    setUploadedFileType(null);
     setOcrWarning("");
     setOcrLoading(false);
     if (billFileInputRef.current) {
@@ -264,6 +256,7 @@ export default function TransactionForm({
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
     if (!file) return;
+    setUploadedFileType(file.type);
     setBillImagePreview(URL.createObjectURL(file));
     void processBillFile(file);
   };
@@ -318,36 +311,72 @@ export default function TransactionForm({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={() => !billImagePreview && billFileInputRef.current?.click()}
-            className={`relative flex flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed p-4 transition-colors text-center min-h-[140px] md:h-full md:min-h-[220px] overflow-hidden ${isDragging
-              ? "border-primary bg-primary/10"
-              : billImagePreview
-                ? "border-muted-foreground/30 bg-muted/30"
-                : "border-muted-foreground/30 bg-muted/30 hover:bg-muted/50 cursor-pointer"
-              }`}
+            onClick={() =>
+              !billImagePreview && billFileInputRef.current?.click()
+            }
+            className={`relative flex flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed p-4 transition-colors text-center min-h-[140px] md:h-full md:min-h-[220px] overflow-hidden ${
+              isDragging
+                ? "border-primary bg-primary/10"
+                : billImagePreview
+                  ? "border-muted-foreground/30 bg-muted/30"
+                  : "border-muted-foreground/30 bg-muted/30 hover:bg-muted/50 cursor-pointer"
+            }`}
           >
+            {/* Hidden file input — accepts images AND PDFs */}
             <input
               ref={billFileInputRef}
               type="file"
-              accept="image/jpeg,image/jpg,image/png,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf,.pdf"
               capture="environment"
               onChange={handleBillUpload}
               className="hidden"
               id="bill-upload-input"
             />
+
             {billImagePreview ? (
               <>
-                <img
-                  src={billImagePreview}
-                  alt="Bill preview"
-                  className="absolute inset-0 h-full w-full object-contain rounded-lg"
-                />
+                {uploadedFileType === "application/pdf" ? (
+                  /* PDF preview — attempt to render the PDF inline; if the
+                     browser can't render it, show a compact fallback with icon */
+                  <object
+                    data={billImagePreview}
+                    type="application/pdf"
+                    className="absolute inset-0 h-full w-full rounded-lg"
+                    aria-label="PDF bill preview"
+                  >
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-lg bg-muted/60">
+                      <FontAwesomeIcon
+                        icon={faFilePdf}
+                        className="h-10 w-10 text-red-500"
+                      />
+                      <p className="text-xs font-medium text-muted-foreground truncate max-w-[80%]">
+                        PDF Bill
+                      </p>
+                    </div>
+                  </object>
+                ) : (
+                  /* Image preview — render normally */
+                  <img
+                    src={billImagePreview}
+                    alt="Bill preview"
+                    className="absolute inset-0 h-full w-full object-contain rounded-lg"
+                  />
+                )}
+
+                {/* Loading overlay shown on top of both image and PDF previews */}
                 {ocrLoading && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-lg bg-black/50">
-                    <FontAwesomeIcon icon={faSpinner} className="h-6 w-6 animate-spin text-white" />
-                    <p className="text-xs font-medium text-white">Reading bill...</p>
+                    <FontAwesomeIcon
+                      icon={faSpinner}
+                      className="h-6 w-6 animate-spin text-white"
+                    />
+                    <p className="text-xs font-medium text-white">
+                      Reading bill...
+                    </p>
                   </div>
                 )}
+
+                {/* Close button */}
                 <button
                   type="button"
                   onClick={(e) => {
@@ -364,7 +393,10 @@ export default function TransactionForm({
               <div className="flex flex-col items-center gap-1.5">
                 <div className="rounded-full bg-primary/10 p-2.5 text-primary">
                   {ocrLoading ? (
-                    <FontAwesomeIcon icon={faSpinner} className="h-4.5 w-4.5 animate-spin" />
+                    <FontAwesomeIcon
+                      icon={faSpinner}
+                      className="h-4.5 w-4.5 animate-spin"
+                    />
                   ) : (
                     <FontAwesomeIcon icon={faCamera} className="h-4.5 w-4.5" />
                   )}
@@ -374,7 +406,7 @@ export default function TransactionForm({
                     {ocrLoading ? "Reading bill..." : "Scan or upload bill"}
                   </p>
                   <p className="text-[10px] text-muted-foreground mt-0.5">
-                    Drag & drop or click
+                    Drag & drop or click · JPG, PNG, PDF
                   </p>
                 </div>
               </div>
@@ -382,7 +414,10 @@ export default function TransactionForm({
           </div>
           {ocrWarning && (
             <p className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-500">
-              <FontAwesomeIcon icon={faTriangleExclamation} className="h-3.5 w-3.5" />
+              <FontAwesomeIcon
+                icon={faTriangleExclamation}
+                className="h-3.5 w-3.5"
+              />
               {ocrWarning}
             </p>
           )}
@@ -425,7 +460,9 @@ export default function TransactionForm({
                 className="h-9"
               />
               {state?.errors?.amount && (
-                <p className="text-xs text-destructive">{state.errors.amount[0]}</p>
+                <p className="text-xs text-destructive">
+                  {state.errors.amount[0]}
+                </p>
               )}
             </div>
             <div className="space-y-1">
@@ -464,9 +501,7 @@ export default function TransactionForm({
                   }}
                 >
                   <SelectTrigger id="category" className="h-9 w-full">
-                    <SelectValue
-                      placeholder="Select a category"
-                    />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent className="min-w-64">
                     {categories.map((c) => (
@@ -480,9 +515,15 @@ export default function TransactionForm({
               {aiMessage && (
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   {categorizingLoading ? (
-                    <FontAwesomeIcon icon={faSpinner} className="h-3.5 w-3.5 animate-spin" />
+                    <FontAwesomeIcon
+                      icon={faSpinner}
+                      className="h-3.5 w-3.5 animate-spin"
+                    />
                   ) : (
-                    <FontAwesomeIcon icon={faCircleInfo} className="h-3.5 w-3.5" />
+                    <FontAwesomeIcon
+                      icon={faCircleInfo}
+                      className="h-3.5 w-3.5"
+                    />
                   )}
                   {aiMessage}
                 </p>
@@ -505,7 +546,11 @@ export default function TransactionForm({
             </div>
           </div>
           <div className="flex justify-end pt-1">
-            <Button type="submit" disabled={pending} className="h-9 gap-2 w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={pending}
+              className="h-9 gap-2 w-full sm:w-auto"
+            >
               {pending ? (
                 <FontAwesomeIcon
                   icon={faSpinner}

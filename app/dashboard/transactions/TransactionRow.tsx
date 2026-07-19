@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
+import { getCategoryColor } from "@/lib/category-colors";
 import { formatCurrency, TransactionItem } from "./transaction-types";
 
 type Props = {
@@ -65,8 +66,8 @@ export default function TransactionRow({
             variant="secondary"
             className="text-[10px] h-5 px-2"
             style={{
-              backgroundColor: `${tx.category.color ?? "#6B7280"}20`,
-              color: tx.category.color ?? "#6B7280",
+              backgroundColor: `${getCategoryColor(tx.category.name, tx.category.color)}20`,
+              color: getCategoryColor(tx.category.name, tx.category.color),
             }}
           >
             {tx.category.name}
